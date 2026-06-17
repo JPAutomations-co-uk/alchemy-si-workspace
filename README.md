@@ -15,42 +15,61 @@ A complete AI-powered sales and marketing system for Alchemy System Integration.
 
 ## Prerequisites
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed — `npm install -g @anthropic-ai/claude-code`
 - Python 3.10+
 - Node.js 18+ and npm
+- Git
 - A free [Anthropic account](https://console.anthropic.com/) for your API key
 
 ---
 
-## Setup (15 minutes)
+## Setup — Antigravity IDE on Windows
 
-### 1. Clone the repo
+> Everything below runs inside Antigravity. Open the built-in terminal with **Ctrl+`** (backtick) and run each command — you never need to leave the IDE.
+
+### 1. Install prerequisites via Antigravity's terminal
+
+`winget` is built into Windows 11. If you're on Windows 10, install it from the [Microsoft Store](https://apps.microsoft.com/store/detail/app-installer/9NBLGGH4NNS1) first.
+
+```powershell
+winget install Python.Python.3.12
+winget install OpenJS.NodeJS
+winget install Git.Git
+```
+
+Close and reopen the terminal in Antigravity after this so the new paths register (`Ctrl+`` to reopen).
+
+### 2. Clone the repo
 
 ```bash
 git clone https://github.com/JPAutomations-co-uk/alchemy-si-workspace.git
-cd alchemy-si-workspace
 ```
 
-### 2. Install dependencies
+Then in Antigravity: **File → Open Folder** → select the `alchemy-si-workspace` folder.
+
+Antigravity will automatically load `AGENTS.md` into its agent context — this contains all 52 skill instructions so the AI knows exactly what it can do for your business.
+
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
-cd execution && npm install && cd ..
+cd execution
+npm install
+cd ..
 ```
 
-### 3. Set up your API keys
+### 4. Set up your API keys
 
-```bash
-cp .env.example .env
+```powershell
+copy .env.example .env
 ```
 
-Open `.env` and fill in the keys you need. Start with just the required one:
+Open `.env` in the Antigravity editor and fill in your keys. Start with just the required one:
 
 ```
 ANTHROPIC_API_KEY=your_key_here
 ```
 
-Add the others as you start using each capability:
+Get it from [console.anthropic.com](https://console.anthropic.com/) — free to sign up. Add the others as you start using each capability:
 
 | Key | What it enables | Where to get it |
 |---|---|---|
@@ -60,33 +79,81 @@ Add the others as you start using each capability:
 | `PANDADOC_API_KEY` | Automated proposals | [pandadoc.com](https://pandadoc.com/) |
 | `FLUX_API_KEY` | AI image generation for ads | [fal.ai](https://fal.ai/) |
 
-### 4. Fill in your business context
+### 5. Fill in your business context
 
-This is the most important step. Open `.claude/business_context.md` and fill in every section marked `[NEEDS INPUT]`:
+Open `.claude/business_context.md` directly in Antigravity and fill in every section marked `[NEEDS INPUT]`:
 
-- Your name and contact details
+- Your name and direct contact details
 - Average contract value (low / typical / high)
 - 3–5 real project case studies (client type, brief, what you built, outcome)
 - Any client testimonials or quotes
 
-The more detail you add here, the better every proposal, email, and piece of copy will be. Claude reads this file before generating anything — it reasons against your real data, not generic placeholders.
+This is the most important step. The AI reads this file before generating anything — every proposal, email, and piece of copy reasons against your real data, not generic placeholders. The more detail here, the better everything else gets.
 
-### 5. Run Claude Code
+### 6. Start using it
+
+Everything runs through Antigravity's agent chat. `AGENTS.md` has already loaded all 52 skill instructions. Just talk to it:
+
+> "Scrape Google Maps for architects in Birmingham and build me a lead sheet."
+
+> "Write a cold email sequence for commercial fit-out project managers, positioning around AV that doesn't fail in client meetings."
+
+> "Generate a proposal from these discovery call notes: [paste your notes]."
+
+For skills that run Python scripts (lead scraping, Instantly campaigns, proposals), the agent runs the scripts from `execution/` directly in Antigravity's terminal — you don't touch anything manually.
+
+### Optional — Add Claude Code for extra power
+
+If you want to run the full Claude Code CLI on top of Antigravity:
 
 ```bash
-claude
+npm install -g @anthropic-ai/claude-code
 ```
 
-That's it. Skills activate automatically based on what you ask for.
+Then type `claude` in the Antigravity terminal. Claude Code reads `CLAUDE.md` automatically and gives you the complete skill system powered specifically by Claude.
+
+---
+
+## Setup — Mac / Linux
+
+### 1. Install prerequisites
+
+**Mac:**
+```bash
+brew install python@3.12 node git
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update && sudo apt install python3 python3-pip nodejs npm git
+```
+
+### 2. Clone and install
+
+```bash
+git clone https://github.com/JPAutomations-co-uk/alchemy-si-workspace.git
+cd alchemy-si-workspace
+pip install -r requirements.txt
+cd execution && npm install && cd ..
+```
+
+### 3. Set up environment and run
+
+```bash
+cp .env.example .env
+# Edit .env and add your ANTHROPIC_API_KEY
+npm install -g @anthropic-ai/claude-code
+claude
+```
 
 ---
 
 ## Your First 5 Sessions
 
-Work through these in order to get the highest-value output fastest.
+Work through these in order to get the highest-value output fastest. Run these prompts directly in Antigravity's agent chat (or Claude Code if you installed it).
 
 ### Session 1 — Fill in business context
-Open Claude Code and say:
+Say:
 > "Help me fill in my business_context.md. I'll answer your questions and you write it."
 
 Claude will interview you on your services, case studies, typical clients, and pricing approach. This powers every other skill.
