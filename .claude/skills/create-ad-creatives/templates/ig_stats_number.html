@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{ background: var(--primary); font-family: var(--font-body); }}
+
+    .ad {{
+        width: {width}px; height: {height}px;
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        text-align: center;
+    }}
+
+    .bg {{
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 50% 50% at 50% 42%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%),
+            linear-gradient(170deg, var(--primary) 0%, var(--secondary) 100%);
+    }}
+
+    .noise {{
+        position: absolute; inset: 0; opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 256px 256px; pointer-events: none; z-index: 1;
+    }}
+
+    .ring-outer {{
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -55%);
+        width: 460px; height: 460px; border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent); z-index: 1;
+    }}
+    .ring-mid {{
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -55%);
+        width: 360px; height: 360px; border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--accent) 8%, transparent); z-index: 1;
+    }}
+    .ring-inner {{
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -55%);
+        width: 260px; height: 260px; border-radius: 50%;
+        background: radial-gradient(circle, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 70%);
+        z-index: 1;
+    }}
+
+    .accent-line {{
+        position: absolute; top: 0; left: 0; right: 0; height: 4px;
+        background: linear-gradient(90deg, transparent 10%, var(--accent) 50%, transparent 90%);
+        z-index: 2;
+    }}
+
+    .content {{
+        position: relative; z-index: 3;
+        display: flex; flex-direction: column;
+        align-items: center; gap: 16px; padding: 0 80px;
+    }}
+
+    .eyebrow {{
+        font-family: var(--font-body); font-weight: 500;
+        font-size: 13px; letter-spacing: 0.25em;
+        text-transform: uppercase; color: var(--accent);
+    }}
+
+    .headline {{
+        font-family: var(--font-heading); font-weight: 900;
+        font-size: clamp(100px, 16vw, 180px); color: var(--text-light);
+        line-height: 0.9; letter-spacing: -0.05em;
+        background: linear-gradient(180deg, var(--text-light) 30%, color-mix(in srgb, var(--accent) 40%, var(--text-light)) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }}
+
+    .subheadline {{
+        font-family: var(--font-heading); font-weight: 700;
+        font-size: clamp(22px, 3.5vw, 36px); color: var(--text-light);
+        letter-spacing: -0.01em; max-width: 600px;
+    }}
+
+    .divider {{
+        width: 48px; height: 3px; background: var(--accent);
+        border-radius: 2px; margin: 4px 0;
+    }}
+
+    .body {{
+        font-family: var(--font-body); font-weight: 300;
+        font-size: 18px; color: rgba(255,255,255,0.5);
+        max-width: 480px; line-height: 1.5;
+    }}
+
+    .cta-btn {{
+        margin-top: 8px; display: inline-block;
+        background: var(--accent); color: white;
+        font-family: var(--font-heading); font-weight: 700;
+        font-size: 15px; padding: 14px 44px; border-radius: 50px;
+        letter-spacing: 0.08em; text-transform: uppercase;
+        box-shadow: 0 8px 32px color-mix(in srgb, var(--accent) 30%, transparent);
+    }}
+
+    .logo {{
+        position: absolute; bottom: 48px; left: 50%;
+        transform: translateX(-50%); height: 30px;
+        opacity: 0.5; z-index: 3;
+    }}
+
+    .hero-img {{
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; opacity: 0.12; z-index: 0;
+    }}
+</style>
+</head>
+<body>
+<div class="ad">
+    <div class="bg"></div>
+    {hero_image_html}
+    <div class="noise"></div>
+    <div class="ring-outer"></div>
+    <div class="ring-mid"></div>
+    <div class="ring-inner"></div>
+    <div class="accent-line"></div>
+
+    <div class="content">
+        <div class="eyebrow">{brand_name}</div>
+        <div class="headline">{headline}</div>
+        <div class="subheadline">{subheadline}</div>
+        <div class="divider"></div>
+        <div class="body">{body}</div>
+        <div class="cta-btn">{cta}</div>
+    </div>
+
+    {logo_html}
+</div>
+</body>
+</html>

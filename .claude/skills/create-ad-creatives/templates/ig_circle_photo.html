@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --bg: {bg_color};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{
+        background: var(--bg);
+        font-family: var(--font-body);
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 56px 72px; gap: 28px;
+    }}
+
+    /* Subtle dot pattern background */
+    .bg-dots {{
+        position: absolute; inset: 0;
+        background-image: radial-gradient(color-mix(in srgb, var(--primary) 8%, transparent) 1px, transparent 1px);
+        background-size: 28px 28px;
+        pointer-events: none; z-index: 0;
+    }}
+
+    /* Soft radial glow behind circle */
+    .bg-glow {{
+        position: absolute;
+        top: 25%; left: 50%; transform: translateX(-50%);
+        width: 500px; height: 500px; border-radius: 50%;
+        background: radial-gradient(circle, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 65%);
+        pointer-events: none; z-index: 0;
+    }}
+
+    .eyebrow {{
+        font-family: var(--font-body); font-size: 12px;
+        font-weight: 600; color: var(--accent);
+        letter-spacing: 0.24em; text-transform: uppercase;
+        z-index: 1;
+        display: flex; align-items: center; gap: 10px;
+    }}
+    .eyebrow::before, .eyebrow::after {{
+        content: ""; width: 18px; height: 1px; background: var(--accent); opacity: 0.5;
+    }}
+
+    .circle-wrap {{
+        position: relative;
+        width: 380px; height: 380px; z-index: 1;
+    }}
+
+    /* Outer decorative ring */
+    .circle-ring-outer {{
+        position: absolute; inset: -12px;
+        border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+    }}
+
+    /* Accent border ring */
+    .circle-ring {{
+        position: absolute; inset: -4px;
+        border-radius: 50%;
+        border: 3px solid var(--accent);
+        box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 15%, transparent);
+    }}
+
+    .circle-inner {{
+        width: 380px; height: 380px;
+        border-radius: 50%; overflow: hidden;
+        background: linear-gradient(145deg, var(--primary) 0%, var(--secondary) 100%);
+        position: relative;
+    }}
+
+    .circle-inner .hero-img {{
+        position: absolute; inset: 0;
+        width: 100%; height: 100%; object-fit: cover;
+    }}
+
+    /* Logo overlay inside circle when no hero image */
+    .circle-inner .logo-center {{
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 1;
+    }}
+    .circle-inner .logo-center img {{
+        height: 80px; object-fit: contain;
+        filter: brightness(0) invert(1);
+    }}
+    .circle-inner .logo-center .brand-name-center {{
+        font-family: var(--font-heading); font-size: 28px;
+        font-weight: 900; color: var(--text-light);
+        letter-spacing: 0.04em;
+    }}
+
+    .headline {{
+        font-family: var(--font-heading);
+        font-size: clamp(30px, 4vw, 40px);
+        font-weight: 900; color: var(--text-dark);
+        line-height: 1.1; text-align: center;
+        max-width: 680px; z-index: 1;
+        letter-spacing: -0.01em;
+    }}
+
+    .subheadline {{
+        font-family: var(--font-body); font-size: 17px;
+        font-weight: 400;
+        color: color-mix(in srgb, var(--text-dark) 55%, transparent);
+        max-width: 520px; line-height: 1.5;
+        text-align: center; z-index: 1; margin-top: -8px;
+    }}
+
+    .cta-btn {{
+        background: var(--accent); color: white;
+        font-family: var(--font-heading); font-size: 16px;
+        font-weight: 700; padding: 14px 40px; border-radius: 6px;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        z-index: 1;
+        box-shadow: 0 6px 24px color-mix(in srgb, var(--accent) 25%, transparent);
+    }}
+
+    .logo-bottom {{
+        position: absolute; bottom: 32px; left: 50%;
+        transform: translateX(-50%); z-index: 2;
+    }}
+    .logo-bottom img {{
+        height: 22px; object-fit: contain; opacity: 0.35;
+    }}
+    .brand-name-small {{
+        font-family: var(--font-heading); font-size: 11px;
+        font-weight: 700;
+        color: color-mix(in srgb, var(--text-dark) 30%, transparent);
+        letter-spacing: 0.12em; text-transform: uppercase;
+    }}
+</style>
+</head>
+<body>
+    <div class="bg-dots"></div>
+    <div class="bg-glow"></div>
+
+    <div class="eyebrow">{brand_name}</div>
+
+    <div class="circle-wrap">
+        <div class="circle-ring-outer"></div>
+        <div class="circle-ring"></div>
+        <div class="circle-inner">
+            {hero_image_html}
+            <div class="logo-center">{logo_html}</div>
+        </div>
+    </div>
+
+    <h1 class="headline">{headline}</h1>
+    <p class="subheadline">{subheadline}</p>
+    <div class="cta-btn">{cta}</div>
+
+    <div class="logo-bottom">{logo_html}</div>
+</body>
+</html>

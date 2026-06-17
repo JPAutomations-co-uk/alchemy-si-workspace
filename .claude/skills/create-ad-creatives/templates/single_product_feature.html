@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width={width}, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@400;600;700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        :root {{
+            --primary: {primary_color};
+            --secondary: {secondary_color};
+            --accent: {accent_color};
+            --text-light: {text_light};
+            --text-dark: {text_dark};
+            --bg: {bg_color};
+            --font-heading: '{heading_font}', 'Inter', sans-serif;
+            --font-body: '{body_font}', 'Inter', sans-serif;
+        }}
+        html, body {{
+            width: {width}px;
+            height: {height}px;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }}
+        .ad {{
+            width: {width}px;
+            height: {height}px;
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 80px 72px;
+            position: relative;
+            overflow: hidden;
+        }}
+
+        .content-card {{
+            background: white;
+            border-radius: 16px;
+            padding: 56px 48px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }}
+
+        .headline {{
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: clamp(36px, 5vw, 52px);
+            line-height: 1.1;
+            color: var(--text-dark);
+            margin-bottom: 32px;
+        }}
+
+        .features {{
+            list-style: none;
+            margin-bottom: 36px;
+        }}
+
+        .feature-item {{
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }}
+
+        .feature-check {{
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }}
+        .feature-check::after {{
+            content: "\2713";
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+        }}
+
+        .feature-text {{
+            font-family: var(--font-body);
+            font-weight: 500;
+            font-size: clamp(17px, 2.2vw, 22px);
+            line-height: 1.4;
+            color: #444;
+        }}
+
+        .cta-button {{
+            display: inline-block;
+            padding: 18px 44px;
+            background: var(--accent);
+            color: var(--text-light);
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 17px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 6px;
+            border: none;
+        }}
+
+        .brand-name {{
+            position: absolute;
+            bottom: 48px;
+            left: 72px;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+        }}
+    </style>
+</head>
+<body>
+    <div class="ad">
+        <div class="content-card">
+            <div class="headline">{headline}</div>
+            <ul class="features">
+                {features_html}
+            </ul>
+            <div class="cta-button">{cta}</div>
+        </div>
+        <div class="brand-name">{brand_name}</div>
+    </div>
+</body>
+</html>

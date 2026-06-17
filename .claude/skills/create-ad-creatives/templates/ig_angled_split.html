@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --bg: {bg_color};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{
+        font-family: var(--font-body);
+        position: relative; overflow: hidden;
+    }}
+
+    /* Right panel — brand content bg */
+    .right-bg {{
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 50% 50% at 80% 50%, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 70%),
+            linear-gradient(160deg, var(--primary) 0%, var(--secondary) 100%);
+    }}
+
+    .noise {{
+        position: absolute; inset: 0; opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 256px 256px; pointer-events: none; z-index: 1;
+    }}
+
+    /* Left panel — photo with diagonal clip */
+    .photo-panel {{
+        position: absolute; inset: 0;
+        clip-path: polygon(0 0, 56% 0, 44% 100%, 0 100%);
+        overflow: hidden; z-index: 2;
+        background: linear-gradient(145deg, var(--secondary) 0%, color-mix(in srgb, var(--secondary) 60%, var(--primary)) 100%);
+    }}
+
+    .photo-panel .hero-img {{
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+    }}
+
+    /* Fade on the diagonal edge */
+    .diagonal-fade {{
+        position: absolute; inset: 0;
+        background: linear-gradient(to right, transparent 50%, rgba(0,0,0,0.4) 100%);
+        z-index: 3;
+    }}
+
+    /* Accent line along the diagonal */
+    .accent-diagonal {{
+        position: absolute; top: 0; bottom: 0;
+        left: 50%; width: 3px; z-index: 5;
+        background: var(--accent);
+        transform: skewX(-8deg);
+        box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 30%, transparent);
+    }}
+
+    /* Right content */
+    .right-content {{
+        position: absolute; top: 0; right: 0;
+        width: 56%; height: 100%;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: flex-end;
+        padding: 64px 56px; gap: 20px; z-index: 4;
+    }}
+
+    .logo-wrap {{
+        display: flex; align-items: center;
+        align-self: flex-end; margin-bottom: 8px;
+    }}
+    .logo-wrap img {{
+        height: 30px; object-fit: contain;
+        filter: brightness(0) invert(1); opacity: 0.7;
+    }}
+    .brand-name-fallback {{
+        font-family: var(--font-heading); font-size: 13px;
+        font-weight: 700; color: rgba(255,255,255,0.45);
+        letter-spacing: 0.12em; text-transform: uppercase;
+    }}
+
+    .eyebrow {{
+        font-family: var(--font-body); font-size: 11px;
+        font-weight: 600; color: var(--accent);
+        letter-spacing: 0.22em; text-transform: uppercase;
+        align-self: flex-end;
+        display: flex; align-items: center; gap: 8px;
+    }}
+    .eyebrow::after {{
+        content: ""; width: 18px; height: 1.5px; background: var(--accent);
+    }}
+
+    .headline {{
+        font-family: var(--font-heading);
+        font-size: clamp(28px, 3.8vw, 42px);
+        font-weight: 900; color: var(--text-light);
+        line-height: 1.08; text-align: right;
+        max-width: 420px; letter-spacing: -0.01em;
+    }}
+
+    .subheadline {{
+        font-family: var(--font-body); font-size: 16px;
+        font-weight: 300; color: rgba(255,255,255,0.55);
+        line-height: 1.5; text-align: right; max-width: 360px;
+    }}
+
+    .cta-btn {{
+        display: inline-block;
+        background: var(--accent); color: white;
+        font-family: var(--font-heading); font-size: 15px;
+        font-weight: 700; padding: 14px 36px; border-radius: 6px;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        align-self: flex-end;
+        box-shadow: 0 6px 24px color-mix(in srgb, var(--accent) 30%, transparent);
+    }}
+</style>
+</head>
+<body>
+    <div class="right-bg"></div>
+    <div class="noise"></div>
+
+    <div class="photo-panel">
+        {hero_image_html}
+        <div class="diagonal-fade"></div>
+    </div>
+
+    <div class="accent-diagonal"></div>
+
+    <div class="right-content">
+        <div class="logo-wrap">{logo_html}</div>
+        <div class="eyebrow">{brand_name}</div>
+        <h1 class="headline">{headline}</h1>
+        <p class="subheadline">{subheadline}</p>
+        <div class="cta-btn">{cta}</div>
+    </div>
+</body>
+</html>

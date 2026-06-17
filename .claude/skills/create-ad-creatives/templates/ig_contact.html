@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --bg: {bg_color};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{
+        font-family: var(--font-body);
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: row;
+    }}
+
+    .left-panel {{
+        flex: 0 0 48%; position: relative;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 28px; padding: 64px 56px;
+        overflow: hidden; z-index: 2;
+    }}
+
+    .left-bg {{
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 80% 80% at 50% 50%, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 60%),
+            linear-gradient(160deg, var(--primary) 0%, var(--secondary) 100%);
+    }}
+
+    .left-noise {{
+        position: absolute; inset: 0; opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 256px 256px; pointer-events: none;
+    }}
+
+    .left-panel::after {{
+        content: ''; position: absolute;
+        right: 0; top: 0; bottom: 0; width: 3px;
+        background: linear-gradient(to bottom, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
+        z-index: 3;
+    }}
+
+    .logo {{ height: 48px; object-fit: contain; filter: brightness(0) invert(1); z-index: 1; }}
+    .brand-name-fallback {{
+        font-family: var(--font-heading); font-size: 24px;
+        font-weight: 900; color: var(--text-light);
+        letter-spacing: 0.05em; text-transform: uppercase;
+    }}
+
+    .contact-icon {{ z-index: 1; opacity: 0.7; }}
+
+    .contact-tagline {{
+        font-family: var(--font-body); font-size: 14px;
+        font-weight: 300; color: rgba(255,255,255,0.45);
+        text-align: center; letter-spacing: 0.06em; z-index: 1;
+    }}
+
+    .right-panel {{
+        flex: 0 0 52%; background: var(--bg);
+        display: flex; flex-direction: column;
+        align-items: flex-start; justify-content: center;
+        padding: 64px; gap: 20px; position: relative;
+    }}
+
+    /* Subtle accent dot grid */
+    .right-deco {{
+        position: absolute; top: 40px; right: 40px;
+        width: 80px; height: 80px;
+        background-image: radial-gradient(circle, color-mix(in srgb, var(--accent) 15%, transparent) 1.5px, transparent 1.5px);
+        background-size: 16px 16px; opacity: 0.5;
+    }}
+
+    .eyebrow {{
+        font-family: var(--font-body); font-size: 12px;
+        font-weight: 600; color: var(--accent);
+        letter-spacing: 0.22em; text-transform: uppercase;
+        display: flex; align-items: center; gap: 8px;
+    }}
+    .eyebrow::before {{
+        content: ""; width: 18px; height: 1.5px; background: var(--accent);
+    }}
+
+    .headline {{
+        font-family: var(--font-heading); font-size: clamp(34px, 4.5vw, 44px);
+        font-weight: 900; color: var(--text-dark); line-height: 1.1;
+    }}
+
+    .subheadline {{
+        font-family: var(--font-body); font-size: 17px;
+        font-weight: 400; color: color-mix(in srgb, var(--text-dark) 55%, transparent);
+        line-height: 1.55; max-width: 380px;
+    }}
+
+    .cta-btn {{
+        background: var(--accent); color: white;
+        font-family: var(--font-heading); font-size: 16px;
+        font-weight: 700; padding: 15px 36px; border-radius: 6px;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        margin-top: 8px; display: inline-block;
+        box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 20%, transparent);
+    }}
+
+    .hero-img {{
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; opacity: 0.06; z-index: 0;
+    }}
+</style>
+</head>
+<body>
+    <div class="left-panel">
+        <div class="left-bg"></div>
+        <div class="left-noise"></div>
+        {logo_html}
+        <div class="contact-icon">
+            <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+                <rect x="8" y="16" width="56" height="40" rx="4" stroke="{accent_color}" stroke-width="2" fill="none"/>
+                <rect x="20" y="28" width="32" height="4" rx="2" fill="{accent_color}" opacity="0.5"/>
+                <rect x="20" y="36" width="20" height="4" rx="2" fill="{accent_color}" opacity="0.35"/>
+                <circle cx="56" cy="20" r="8" fill="{accent_color}"/>
+                <path d="M52 20 L56 24 L62 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+        </div>
+        <div class="contact-tagline">{brand_name}</div>
+    </div>
+
+    <div class="right-panel">
+        {hero_image_html}
+        <div class="right-deco"></div>
+        <div class="eyebrow">Get In Touch</div>
+        <h1 class="headline">{headline}</h1>
+        <p class="subheadline">{subheadline}</p>
+        <div class="cta-btn">{cta}</div>
+    </div>
+</body>
+</html>

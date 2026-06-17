@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        :root {{
+            --primary: {primary_color};
+            --secondary: {secondary_color};
+            --accent: {accent_color};
+            --text-light: {text_light};
+            --font-heading: '{heading_font}', 'Inter', sans-serif;
+            --font-body: '{body_font}', 'Inter', sans-serif;
+        }}
+        html, body {{
+            width: {width}px; height: {height}px;
+            overflow: hidden; -webkit-font-smoothing: antialiased;
+            background: var(--primary);
+        }}
+
+        /* ── ANIMATED GRADIENT BACKGROUND ── */
+        @keyframes gradientShift {{
+            0%   {{ background-position: 0% 50%; }}
+            50%  {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+
+        @keyframes floatOrb1 {{
+            0%,100% {{ transform: translate(0px, 0px) scale(1); }}
+            33%      {{ transform: translate(80px, -60px) scale(1.1); }}
+            66%      {{ transform: translate(-40px, 80px) scale(0.95); }}
+        }}
+        @keyframes floatOrb2 {{
+            0%,100% {{ transform: translate(0px, 0px) scale(1); }}
+            33%      {{ transform: translate(-70px, 50px) scale(1.05); }}
+            66%      {{ transform: translate(60px, -80px) scale(1.1); }}
+        }}
+        @keyframes floatOrb3 {{
+            0%,100% {{ transform: translate(0px, 0px); }}
+            50%      {{ transform: translate(50px, 50px); }}
+        }}
+
+        @keyframes fadeUp {{
+            from {{ opacity: 0; transform: translateY(40px); }}
+            to   {{ opacity: 1; transform: translateY(0); }}
+        }}
+        @keyframes fadeIn {{
+            from {{ opacity: 0; }}
+            to   {{ opacity: 1; }}
+        }}
+        @keyframes scaleIn {{
+            from {{ opacity: 0; transform: scaleX(0); }}
+            to   {{ opacity: 1; transform: scaleX(1); }}
+        }}
+
+        .bg {{
+            position: absolute; inset: 0;
+            background: linear-gradient(
+                -45deg,
+                var(--primary),
+                var(--secondary),
+                color-mix(in srgb, var(--accent) 40%, var(--primary)),
+                color-mix(in srgb, var(--primary) 60%, var(--secondary))
+            );
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }}
+
+        /* Floating colour orbs */
+        .orb {{
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }}
+        .orb-1 {{
+            width: 500px; height: 500px;
+            top: -100px; left: -100px;
+            background: radial-gradient(circle, color-mix(in srgb, var(--accent) 50%, transparent), transparent 70%);
+            animation: floatOrb1 10s ease-in-out infinite;
+        }}
+        .orb-2 {{
+            width: 400px; height: 400px;
+            bottom: -80px; right: -80px;
+            background: radial-gradient(circle, color-mix(in srgb, var(--secondary) 60%, var(--accent)), transparent 70%);
+            animation: floatOrb2 12s ease-in-out infinite;
+        }}
+        .orb-3 {{
+            width: 300px; height: 300px;
+            top: 40%; left: 60%;
+            background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent), transparent 70%);
+            animation: floatOrb3 7s ease-in-out infinite;
+        }}
+
+        /* Subtle grid overlay */
+        .grid-overlay {{
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }}
+
+        /* Content */
+        .content {{
+            position: absolute; inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 80px 80px;
+            z-index: 10;
+        }}
+
+        .eyebrow {{
+            font-family: var(--font-body);
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+            animation-delay: 0.5s;
+        }}
+
+        .headline {{
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: clamp(48px, 8vw, 82px);
+            line-height: 1.05;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards;
+            animation-delay: 0.9s;
+        }}
+
+        .accent-bar {{
+            width: 72px; height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+            margin-bottom: 28px;
+            transform-origin: left;
+            opacity: 0;
+            animation: scaleIn 0.7s cubic-bezier(0.22,1,0.36,1) forwards;
+            animation-delay: 1.5s;
+        }}
+
+        .subheadline {{
+            font-family: var(--font-body);
+            font-weight: 300;
+            font-size: clamp(17px, 2.5vw, 24px);
+            line-height: 1.55;
+            color: rgba(255,255,255,0.65);
+            max-width: 72%;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards;
+            animation-delay: 1.8s;
+        }}
+
+        .cta-pill {{
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 44px;
+            padding: 16px 36px;
+            background: var(--accent);
+            border-radius: 100px;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: white;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards;
+            animation-delay: 2.3s;
+        }}
+
+        .logo {{
+            position: absolute;
+            top: 48px; right: 64px;
+            height: 36px; opacity: 0;
+            z-index: 10;
+            animation: fadeIn 0.8s ease forwards;
+            animation-delay: 0.3s;
+        }}
+        .brand-name {{
+            position: absolute;
+            top: 52px; right: 64px;
+            font-family: var(--font-heading);
+            font-weight: 800; font-size: 14px;
+            letter-spacing: 0.14em; text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            z-index: 10;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+            animation-delay: 0.3s;
+        }}
+    </style>
+</head>
+<body>
+    <div class="bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-overlay"></div>
+    <div class="content">
+        <div class="eyebrow">{brand_name}</div>
+        <div class="headline">{headline}</div>
+        <div class="accent-bar"></div>
+        <div class="subheadline">{subheadline}</div>
+        <div class="cta-pill">{cta}</div>
+    </div>
+    {logo_html}
+    <div class="brand-name">{brand_name}</div>
+</body>
+</html>

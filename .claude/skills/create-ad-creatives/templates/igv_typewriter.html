@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{brand_name} — Typewriter</title>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --text-dark: {text_dark};
+    --bg: {bg_color};
+    --font-heading: '{heading_font}', 'Inter', sans-serif;
+    --font-body: '{body_font}', 'Inter', sans-serif;
+}}
+html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+body {{
+    background: var(--primary);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+}}
+
+/* Subtle noise texture */
+body::before {{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-conic-gradient(rgba(255,255,255,0.015) 0%, rgba(255,255,255,0) 0.02%);
+    background-size: 4px 4px;
+    pointer-events: none;
+    z-index: 0;
+}}
+
+/* Background code-like floating strings */
+.bg-code {{
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--text-light);
+    opacity: 0.05;
+    user-select: none;
+    z-index: 1;
+    white-space: nowrap;
+}}
+
+.bg-code-1 {{
+    top: 15%;
+    left: -20px;
+    transform: rotate(-8deg);
+    animation: fadeIn 1s ease forwards 0.3s;
+}}
+
+.bg-code-2 {{
+    bottom: 18%;
+    right: -20px;
+    transform: rotate(6deg);
+    animation: fadeIn 1s ease forwards 0.5s;
+}}
+
+/* Logo fades in top */
+.logo-top {{
+    position: absolute;
+    top: 52px;
+    left: 80px;
+    z-index: 20;
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}}
+
+.logo-top img {{
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}}
+
+.logo-top .brand-label {{
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}}
+
+/* Content wrapper */
+.content {{
+    position: relative;
+    z-index: 10;
+    padding: 0 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    max-width: {width}px;
+}}
+
+/* Top horizontal rule */
+.rule {{
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.12);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards 0.4s;
+}}
+
+.rule-bottom {{
+    margin-top: 24px;
+    margin-bottom: 0;
+    animation-delay: 0.6s;
+}}
+
+/* Eyebrow */
+.eyebrow {{
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards 0.5s;
+}}
+
+/* Typewriter headline container */
+.typewriter-wrap {{
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    max-width: 100%;
+}}
+
+.headline {{
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 60px;
+    color: var(--text-light);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 0;
+    border-right: 3px solid var(--accent);
+    animation:
+        typing 2.2s steps(30, end) 0.8s forwards,
+        blink 0.75s step-end infinite;
+    animation-fill-mode: forwards;
+}}
+
+/* After typing finishes, hide cursor via a separate element */
+.cursor-hide {{
+    display: inline-block;
+    width: 3px;
+    height: 60px;
+    background: var(--accent);
+    margin-left: 4px;
+    vertical-align: top;
+    animation: blink 0.75s step-end infinite, cursorFade 0.1s ease 3.2s forwards;
+}}
+
+/* Subheadline fades in after typing */
+.subheadline {{
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 21px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.55;
+    margin-top: 22px;
+    max-width: 400px;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 3.4s;
+}}
+
+/* CTA */
+.cta-btn {{
+    display: inline-block;
+    margin-top: 26px;
+    padding: 14px 38px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 4.0s;
+}}
+
+/* Keyframes */
+@keyframes fadeIn {{
+    from {{ opacity: 0; }}
+    to {{ opacity: 1; }}
+}}
+
+@keyframes fadeUp {{
+    from {{ opacity: 0; transform: translateY(24px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+}}
+
+@keyframes typing {{
+    from {{ width: 0; }}
+    to {{ width: 100%; }}
+}}
+
+@keyframes blink {{
+    0%, 50% {{ border-color: var(--accent); }}
+    51%, 100% {{ border-color: transparent; }}
+}}
+
+@keyframes cursorFade {{
+    from {{ opacity: 1; }}
+    to {{ opacity: 0; }}
+}}
+</style>
+</head>
+<body>
+
+<!-- Background code strings -->
+<div class="bg-code bg-code-1">function generate() {{ return results.map(x => x * 100).filter(Boolean); }}</div>
+<div class="bg-code bg-code-2">const output = await pipeline.run({{ input, context, optimize: true }});</div>
+
+<!-- Logo top-left -->
+<div class="logo-top">
+    {logo_html}
+    <span class="brand-label">{brand_name}</span>
+</div>
+
+<!-- Content -->
+<div class="content">
+    <div class="rule"></div>
+
+    <div class="eyebrow">// {brand_name}</div>
+
+    <div class="typewriter-wrap">
+        <div class="headline">{headline}</div>
+    </div>
+
+    <div class="rule rule-bottom"></div>
+
+    <div class="subheadline">{subheadline}</div>
+
+    <button class="cta-btn">{cta}</button>
+</div>
+
+</body>
+</html>

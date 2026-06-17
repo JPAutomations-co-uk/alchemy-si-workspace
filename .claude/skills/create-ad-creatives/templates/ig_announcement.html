@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{
+        background: var(--primary);
+        font-family: var(--font-body);
+        position: relative; overflow: hidden;
+    }}
+
+    .bg {{
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 50% 40% at 80% 30%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%),
+            linear-gradient(160deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 85%, black) 100%);
+    }}
+
+    .noise {{
+        position: absolute; inset: 0; opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 256px 256px; pointer-events: none; z-index: 1;
+    }}
+
+    /* Accent band top 28% */
+    .accent-band {{
+        position: absolute; top: 0; left: 0; right: 0; height: 28%;
+        background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 80%, var(--primary)) 100%);
+        z-index: 0;
+    }}
+    .accent-band::after {{
+        content: ""; position: absolute; bottom: -60px; left: 0; right: 0; height: 60px;
+        background: linear-gradient(to bottom, color-mix(in srgb, var(--accent) 15%, transparent), transparent);
+    }}
+
+    /* Eyebrow badge on accent band */
+    .eyebrow-bar {{
+        position: absolute; top: 0; left: 0; right: 0; height: 52px;
+        display: flex; align-items: center; justify-content: center; z-index: 10;
+    }}
+    .eyebrow-badge {{
+        background: white; color: var(--accent);
+        font-family: var(--font-heading); font-size: 13px;
+        font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase;
+        padding: 8px 28px; border-radius: 2px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }}
+
+    .main {{
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: flex-start; justify-content: center;
+        padding: 80px; padding-top: 180px; z-index: 2;
+    }}
+
+    .headline {{
+        font-family: var(--font-heading); font-size: clamp(44px, 6.5vw, 60px);
+        font-weight: 900; color: var(--text-light);
+        line-height: 1.08; max-width: 780px;
+        letter-spacing: -0.02em; margin-bottom: 28px;
+    }}
+
+    .subheadline {{
+        font-family: var(--font-body); font-size: 21px;
+        font-weight: 300; color: rgba(255,255,255,0.6);
+        max-width: 600px; line-height: 1.55; margin-bottom: 44px;
+    }}
+
+    .cta-row {{ display: flex; align-items: center; gap: 24px; }}
+
+    .cta-btn {{
+        background: var(--accent); color: white;
+        font-family: var(--font-heading); font-size: 16px;
+        font-weight: 700; padding: 16px 44px; border-radius: 6px;
+        letter-spacing: 0.05em; text-transform: uppercase;
+        box-shadow: 0 6px 24px color-mix(in srgb, var(--accent) 30%, transparent);
+    }}
+
+    .tag {{
+        font-family: var(--font-body); font-size: 14px;
+        font-weight: 500; color: rgba(255,255,255,0.4);
+        letter-spacing: 0.06em; text-transform: uppercase;
+    }}
+
+    .logo {{
+        position: absolute; bottom: 52px; right: 72px;
+        height: 34px; object-fit: contain; opacity: 0.5;
+        z-index: 3; filter: brightness(0) invert(1);
+    }}
+
+    .hero-img {{
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; opacity: 0.08; z-index: 0;
+    }}
+</style>
+</head>
+<body>
+    <div class="bg"></div>
+    {hero_image_html}
+    <div class="noise"></div>
+    <div class="accent-band"></div>
+
+    <div class="eyebrow-bar">
+        <div class="eyebrow-badge">Introducing</div>
+    </div>
+
+    <div class="main">
+        <h1 class="headline">{headline}</h1>
+        <p class="subheadline">{subheadline}</p>
+        <div class="cta-row">
+            <div class="cta-btn">{cta}</div>
+            <div class="tag">Available Now</div>
+        </div>
+    </div>
+
+    {logo_html}
+</body>
+</html>

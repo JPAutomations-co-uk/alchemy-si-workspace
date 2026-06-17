@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{brand_name} — Neon Pulse</title>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --text-dark: {text_dark};
+    --bg: {bg_color};
+    --font-heading: '{heading_font}', 'Inter', sans-serif;
+    --font-body: '{body_font}', 'Inter', sans-serif;
+}}
+html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+body {{
+    background: #050510;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+    font-family: var(--font-body);
+}}
+
+/* Radial glow center */
+body::before {{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 55% at 50% 50%, var(--accent), transparent 65%);
+    opacity: 0.08;
+    pointer-events: none;
+}}
+
+/* Scanline texture */
+body::after {{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.02) 0px,
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 2;
+}}
+
+/* Neon border */
+.neon-border {{
+    position: absolute;
+    inset: 24px;
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 20px var(--accent), inset 0 0 20px rgba(255,255,255,0.02);
+    border-radius: 4px;
+    animation: borderPulse 1.5s ease-in-out infinite;
+    z-index: 3;
+    pointer-events: none;
+}}
+
+/* Corner L-brackets */
+.corner {{
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    z-index: 10;
+    opacity: 0;
+}}
+
+.corner::before,
+.corner::after {{
+    content: '';
+    position: absolute;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+}}
+
+.corner-tl {{ top: 16px; left: 16px; animation: fadeIn 0.4s ease forwards 0.2s; }}
+.corner-tl::before {{ top: 0; left: 0; width: 30px; height: 2px; }}
+.corner-tl::after {{ top: 0; left: 0; width: 2px; height: 30px; }}
+
+.corner-tr {{ top: 16px; right: 16px; animation: fadeIn 0.4s ease forwards 0.4s; }}
+.corner-tr::before {{ top: 0; right: 0; width: 30px; height: 2px; }}
+.corner-tr::after {{ top: 0; right: 0; width: 2px; height: 30px; }}
+
+.corner-bl {{ bottom: 16px; left: 16px; animation: fadeIn 0.4s ease forwards 0.6s; }}
+.corner-bl::before {{ bottom: 0; left: 0; width: 30px; height: 2px; }}
+.corner-bl::after {{ bottom: 0; left: 0; width: 2px; height: 30px; }}
+
+.corner-br {{ bottom: 16px; right: 16px; animation: fadeIn 0.4s ease forwards 0.8s; }}
+.corner-br::before {{ bottom: 0; right: 0; width: 30px; height: 2px; }}
+.corner-br::after {{ bottom: 0; right: 0; width: 2px; height: 30px; }}
+
+/* Scan sweep line */
+.scan-sweep {{
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
+    top: 24px;
+    z-index: 15;
+    animation: scanSweep 3s ease-in-out infinite;
+}}
+
+/* Logo brand top */
+.logo-top {{
+    position: relative;
+    z-index: 10;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.3s;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}}
+
+.logo-top img {{
+    height: 40px;
+    width: auto;
+    filter: drop-shadow(0 0 8px var(--accent));
+}}
+
+.logo-top .brand-label {{
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--accent);
+}}
+
+/* Content */
+.content {{
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 60px;
+    max-width: 520px;
+}}
+
+.headline {{
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 58px;
+    color: var(--text-light);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    animation: neonGlow 2s ease-in-out infinite, fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards 0.6s;
+    opacity: 0;
+}}
+
+.subheadline {{
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 20px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.5;
+    margin-top: 22px;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 1.4s;
+}}
+
+.cta-btn {{
+    display: inline-block;
+    margin-top: 30px;
+    padding: 14px 38px;
+    background: transparent;
+    color: var(--accent);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    border: 2px solid var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 16px var(--accent), inset 0 0 16px rgba(255,255,255,0.02);
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 2.0s;
+    text-shadow: 0 0 10px var(--accent);
+}}
+
+/* Keyframes */
+@keyframes neonGlow {{
+    0%, 100% {{
+        text-shadow: 0 0 10px var(--accent), 0 0 30px var(--accent), 0 0 60px var(--accent);
+    }}
+    50% {{
+        text-shadow: 0 0 5px var(--accent), 0 0 15px var(--accent);
+    }}
+}}
+
+@keyframes borderPulse {{
+    0%, 100% {{ opacity: 1; }}
+    50% {{ opacity: 0.6; }}
+}}
+
+@keyframes scanSweep {{
+    0% {{ top: 24px; opacity: 0; }}
+    5% {{ opacity: 1; }}
+    95% {{ opacity: 1; }}
+    100% {{ top: calc(100% - 26px); opacity: 0; }}
+}}
+
+@keyframes fadeIn {{
+    from {{ opacity: 0; }}
+    to {{ opacity: 1; }}
+}}
+
+@keyframes fadeUp {{
+    from {{ opacity: 0; transform: translateY(30px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+}}
+</style>
+</head>
+<body>
+
+<!-- Neon border frame -->
+<div class="neon-border"></div>
+
+<!-- Corner L-brackets -->
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<!-- Scan sweep -->
+<div class="scan-sweep"></div>
+
+<!-- Logo / brand -->
+<div class="logo-top">
+    {logo_html}
+    <span class="brand-label">{brand_name}</span>
+</div>
+
+<!-- Main content -->
+<div class="content">
+    <div class="headline">{headline}</div>
+    <div class="subheadline">{subheadline}</div>
+    <button class="cta-btn">{cta}</button>
+</div>
+
+</body>
+</html>

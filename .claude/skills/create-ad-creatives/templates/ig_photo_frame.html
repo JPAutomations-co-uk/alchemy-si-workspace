@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --bg: {bg_color};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{
+        background: var(--primary);
+        font-family: var(--font-body);
+        padding: 40px;
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+    }}
+
+    .bg-layer {{
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 60% 60% at 50% 50%, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 70%),
+            linear-gradient(155deg, var(--primary) 0%, var(--secondary) 100%);
+    }}
+
+    .noise {{
+        position: absolute; inset: 0; opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 256px 256px; pointer-events: none; z-index: 1;
+    }}
+
+    /* Corner accent brackets */
+    .corner {{ position: absolute; width: 28px; height: 28px; z-index: 4; }}
+    .corner-tl {{ top: 16px; left: 16px; border-top: 2.5px solid var(--accent); border-left: 2.5px solid var(--accent); }}
+    .corner-tr {{ top: 16px; right: 16px; border-top: 2.5px solid var(--accent); border-right: 2.5px solid var(--accent); }}
+    .corner-bl {{ bottom: 16px; left: 16px; border-bottom: 2.5px solid var(--accent); border-left: 2.5px solid var(--accent); }}
+    .corner-br {{ bottom: 16px; right: 16px; border-bottom: 2.5px solid var(--accent); border-right: 2.5px solid var(--accent); }}
+
+    .inner-frame {{
+        flex: 1; position: relative;
+        border-radius: 6px; overflow: hidden;
+        background: linear-gradient(145deg, var(--secondary) 0%, color-mix(in srgb, var(--secondary) 60%, var(--primary)) 100%);
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px rgba(0,0,0,0.3);
+        z-index: 2;
+    }}
+
+    .inner-frame .hero-img {{
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+    }}
+
+    /* Gradient overlay at bottom for text legibility */
+    .overlay {{
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: 55%;
+        background: linear-gradient(
+            to top,
+            rgba(0,0,0,0.82) 0%,
+            rgba(0,0,0,0.55) 35%,
+            rgba(0,0,0,0.15) 70%,
+            transparent 100%
+        );
+        z-index: 2;
+    }}
+
+    .content {{
+        position: absolute; bottom: 0; left: 0; right: 0;
+        padding: 32px 36px; z-index: 3;
+        display: flex; flex-direction: column; gap: 10px;
+    }}
+
+    .eyebrow {{
+        font-family: var(--font-body); font-size: 11px;
+        font-weight: 600; color: var(--accent);
+        letter-spacing: 0.22em; text-transform: uppercase;
+        display: flex; align-items: center; gap: 8px;
+    }}
+    .eyebrow::before {{
+        content: ""; width: 16px; height: 1.5px; background: var(--accent);
+    }}
+
+    .headline-text {{
+        font-family: var(--font-heading);
+        font-size: clamp(28px, 4vw, 38px);
+        font-weight: 900; color: white;
+        line-height: 1.1; letter-spacing: -0.01em;
+    }}
+
+    .sub-text {{
+        font-family: var(--font-body); font-size: 15px;
+        font-weight: 300; color: rgba(255,255,255,0.6);
+        line-height: 1.5; max-width: 420px;
+    }}
+
+    .cta-btn {{
+        display: inline-block;
+        background: var(--accent); color: white;
+        font-family: var(--font-heading); font-size: 14px;
+        font-weight: 700; padding: 12px 32px; border-radius: 6px;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        margin-top: 4px;
+        box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent);
+    }}
+
+    .brand-badge {{
+        position: absolute; top: 20px; right: 20px;
+        background: rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 8px; padding: 10px 18px;
+        z-index: 3; backdrop-filter: blur(12px);
+        display: flex; align-items: center; justify-content: center;
+    }}
+
+    .brand-badge img {{
+        height: 24px; object-fit: contain;
+        filter: brightness(0) invert(1);
+    }}
+
+    .brand-badge-name {{
+        font-family: var(--font-heading); font-size: 12px;
+        font-weight: 700; color: var(--text-light);
+        letter-spacing: 0.1em; text-transform: uppercase;
+    }}
+</style>
+</head>
+<body>
+    <div class="bg-layer"></div>
+    <div class="noise"></div>
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <div class="inner-frame">
+        {hero_image_html}
+        <div class="overlay"></div>
+
+        <div class="content">
+            <div class="eyebrow">{brand_name}</div>
+            <h1 class="headline-text">{headline}</h1>
+            <p class="sub-text">{subheadline}</p>
+            <div class="cta-btn">{cta}</div>
+        </div>
+
+        <div class="brand-badge">
+            {logo_html}
+        </div>
+    </div>
+</body>
+</html>

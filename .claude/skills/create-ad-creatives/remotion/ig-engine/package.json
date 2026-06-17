@@ -1,0 +1,22 @@
+{
+  "name": "ig-engine-remotion",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "studio": "npx remotion studio src/Root.tsx",
+    "render": "npx remotion render src/Root.tsx IgEngine .tmp/ig_engine_4k.mp4 --width 3840 --height 2160 --fps 30 --codec h264 --crf 8 --concurrency 4",
+    "render:preview": "npx remotion render src/Root.tsx IgEngine .tmp/ig_engine_preview.mp4 --width 1920 --height 1080 --fps 30 --codec h264 --crf 18 --concurrency 4"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.380",
+    "@remotion/cli": "4.0.380",
+    "geist": "^1.7.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "4.0.380"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.9.3"
+  }
+}

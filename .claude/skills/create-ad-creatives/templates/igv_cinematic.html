@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{brand_name} — Cinematic</title>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --text-dark: {text_dark};
+    --bg: {bg_color};
+    --font-heading: '{heading_font}', 'Inter', sans-serif;
+    --font-body: '{body_font}', 'Inter', sans-serif;
+}}
+html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+body {{
+    background: linear-gradient(160deg, color-mix(in srgb, var(--primary) 90%, #000) 0%, #000000 100%);
+    position: relative;
+    font-family: var(--font-body);
+}}
+
+/* Hero image background (Ken Burns) */
+.hero-bg {{
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+}}
+
+.hero-bg-inner {{
+    position: absolute;
+    inset: -5%;
+    width: 110%;
+    height: 110%;
+}}
+
+.hero-bg-inner img {{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    animation: kenBurns 15s ease forwards;
+}}
+
+/* Fallback gradient if no image */
+.hero-bg-fallback {{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 40%, #000) 100%);
+}}
+
+/* Dark vignette overlay */
+.vignette {{
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 90% 80% at 50% 40%, transparent 20%, rgba(0,0,0,0.65) 100%);
+    z-index: 2;
+    pointer-events: none;
+}}
+
+/* Bottom gradient */
+.bottom-grad {{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 55%;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%);
+    z-index: 3;
+    pointer-events: none;
+}}
+
+/* Letterbox bars */
+.bar-top {{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: #000;
+    z-index: 15;
+    transform: translateY(-100%);
+    animation: slideDownBar 0.8s cubic-bezier(0.77,0,0.18,1) forwards 0.1s;
+}}
+
+.bar-bottom {{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: #000;
+    z-index: 15;
+    transform: translateY(100%);
+    animation: slideUpBar 0.8s cubic-bezier(0.77,0,0.18,1) forwards 0.1s;
+}}
+
+/* Logo — inside top bar */
+.logo-top {{
+    position: absolute;
+    top: 28px;
+    left: 52px;
+    z-index: 20;
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards 1.0s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}}
+
+.logo-top img {{
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}}
+
+.logo-top .brand-label {{
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}}
+
+/* Content block — above bottom bar */
+.content {{
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    right: 0;
+    padding: 0 60px 40px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}}
+
+/* Eyebrow */
+.eyebrow {{
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards 1.5s;
+}}
+
+/* Headline */
+.headline {{
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: clamp(44px, 7vw, 70px);
+    color: var(--text-light);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    max-width: 500px;
+    opacity: 0;
+    animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards 1.8s;
+}}
+
+/* Accent bar */
+.accent-bar {{
+    width: 56px;
+    height: 3px;
+    background: var(--accent);
+    margin: 18px 0;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: scaleInX 0.6s cubic-bezier(0.22,1,0.36,1) forwards 2.4s;
+}}
+
+/* Subheadline */
+.subheadline {{
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 19px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.55;
+    max-width: 380px;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 2.7s;
+}}
+
+/* CTA pill */
+.cta-btn {{
+    display: inline-block;
+    margin-top: 24px;
+    padding: 14px 36px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 3.2s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}}
+
+/* Keyframes */
+@keyframes kenBurns {{
+    from {{ transform: scale(1) translate(0, 0); }}
+    to {{ transform: scale(1.08) translate(-20px, -10px); }}
+}}
+
+@keyframes slideDownBar {{
+    from {{ transform: translateY(-100%); }}
+    to {{ transform: translateY(0); }}
+}}
+
+@keyframes slideUpBar {{
+    from {{ transform: translateY(100%); }}
+    to {{ transform: translateY(0); }}
+}}
+
+@keyframes fadeIn {{
+    from {{ opacity: 0; }}
+    to {{ opacity: 1; }}
+}}
+
+@keyframes fadeUp {{
+    from {{ opacity: 0; transform: translateY(28px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+}}
+
+@keyframes scaleInX {{
+    from {{ transform: scaleX(0); }}
+    to {{ transform: scaleX(1); }}
+}}
+</style>
+</head>
+<body>
+
+<!-- Hero background -->
+<div class="hero-bg">
+    <div class="hero-bg-inner">
+        {hero_image_html}
+    </div>
+    <div class="hero-bg-fallback"></div>
+</div>
+
+<!-- Overlays -->
+<div class="vignette"></div>
+<div class="bottom-grad"></div>
+
+<!-- Letterbox bars -->
+<div class="bar-top"></div>
+<div class="bar-bottom"></div>
+
+<!-- Logo in top bar -->
+<div class="logo-top">
+    {logo_html}
+    <span class="brand-label">{brand_name}</span>
+</div>
+
+<!-- Main content -->
+<div class="content">
+    <div class="eyebrow">Featured</div>
+    <div class="headline">{headline}</div>
+    <div class="accent-bar"></div>
+    <div class="subheadline">{subheadline}</div>
+    <button class="cta-btn">{cta}</button>
+</div>
+
+</body>
+</html>

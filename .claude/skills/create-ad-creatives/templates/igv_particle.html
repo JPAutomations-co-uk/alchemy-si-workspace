@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{brand_name} — Particle Field</title>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --text-dark: {text_dark};
+    --bg: {bg_color};
+    --font-heading: '{heading_font}', 'Inter', sans-serif;
+    --font-body: '{body_font}', 'Inter', sans-serif;
+}}
+html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+body {{
+    background: var(--primary);
+    position: relative;
+    font-family: var(--font-body);
+}}
+
+/* Canvas particle background */
+canvas#particles {{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}}
+
+/* Dark radial vignette over canvas */
+.vignette {{
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 30%, rgba(0,0,0,0.45) 100%);
+    z-index: 2;
+    pointer-events: none;
+}}
+
+/* Content overlay */
+.content {{
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px;
+}}
+
+/* Logo top */
+.logo-top {{
+    position: absolute;
+    top: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards 0.5s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}}
+
+.logo-top img {{
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+}}
+
+.logo-top .brand-label {{
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}}
+
+/* Headline */
+.headline {{
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 64px;
+    color: var(--text-light);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    max-width: 480px;
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.22,1,0.36,1) forwards 1.0s;
+}}
+
+/* Accent bar */
+.accent-bar {{
+    width: 56px;
+    height: 3px;
+    background: var(--accent);
+    margin: 20px auto;
+    transform: scaleX(0);
+    transform-origin: center;
+    animation: scaleInX 0.6s cubic-bezier(0.22,1,0.36,1) forwards 1.4s;
+}}
+
+/* Subheadline */
+.subheadline {{
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 20px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.55;
+    max-width: 360px;
+    opacity: 0;
+    animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards 1.6s;
+}}
+
+/* CTA pill */
+.cta-btn {{
+    display: inline-block;
+    margin-top: 28px;
+    padding: 15px 40px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards 2.2s;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}}
+
+/* Keyframes */
+@keyframes fadeIn {{
+    from {{ opacity: 0; }}
+    to {{ opacity: 1; }}
+}}
+
+@keyframes fadeUp {{
+    from {{ opacity: 0; transform: translateY(32px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+}}
+
+@keyframes scaleInX {{
+    from {{ transform: scaleX(0); }}
+    to {{ transform: scaleX(1); }}
+}}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div class="vignette"></div>
+
+<!-- Logo -->
+<div class="logo-top">
+    {logo_html}
+    <span class="brand-label">{brand_name}</span>
+</div>
+
+<!-- Content -->
+<div class="content">
+    <div class="headline">{headline}</div>
+    <div class="accent-bar"></div>
+    <div class="subheadline">{subheadline}</div>
+    <button class="cta-btn">{cta}</button>
+</div>
+
+<script>
+(function() {{
+    var canvas = document.getElementById('particles');
+    var ctx = canvas.getContext('2d');
+    canvas.width = {width};
+    canvas.height = {height};
+    var accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#E94560';
+    var particles = [];
+    var count = 80;
+    for (var i = 0; i < count; i++) {{
+        particles.push({{
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.6,
+            vy: (Math.random() - 0.5) * 0.6,
+            r: Math.random() * 2.5 + 1,
+            opacity: Math.random() * 0.5 + 0.2
+        }});
+    }}
+    function hexToRgb(hex) {{
+        hex = hex.replace('#','');
+        if (hex.length === 3) hex = hex.split('').map(function(c){{return c+c;}}).join('');
+        var r = parseInt(hex.substring(0,2),16);
+        var g = parseInt(hex.substring(2,4),16);
+        var b = parseInt(hex.substring(4,6),16);
+        return r+','+g+','+b;
+    }}
+    var accentRgb = '233,69,96';
+    try {{ accentRgb = hexToRgb(accent); }} catch(e) {{}}
+    function draw() {{
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(function(p) {{
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0) p.x = canvas.width;
+            if (p.x > canvas.width) p.x = 0;
+            if (p.y < 0) p.y = canvas.height;
+            if (p.y > canvas.height) p.y = 0;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            ctx.fillStyle = 'rgba('+accentRgb+','+p.opacity+')';
+            ctx.fill();
+        }});
+        for (var i = 0; i < particles.length; i++) {{
+            for (var j = i+1; j < particles.length; j++) {{
+                var dx = particles[i].x - particles[j].x;
+                var dy = particles[i].y - particles[j].y;
+                var dist = Math.sqrt(dx*dx+dy*dy);
+                if (dist < 120) {{
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = 'rgba('+accentRgb+','+(0.15*(1-dist/120))+')';
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }}
+            }}
+        }}
+        requestAnimationFrame(draw);
+    }}
+    draw();
+}})();
+</script>
+
+</body>
+</html>

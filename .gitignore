@@ -1,0 +1,47 @@
+# Environment & secrets
+.env
+credentials.json
+credentials_*.json
+token.json
+token_*.json
+gmail_accounts.json
+*.pem
+*.key
+
+# Temporary processing files
+.tmp/
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+.nuxt/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+*.swp
+
+# Logs
+*.log
+logs/
+
+# Large media files (use cloud storage instead)
+*.mp4
+*.mov
+*.avi
+*.mkv

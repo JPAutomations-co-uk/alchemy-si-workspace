@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{ background: #080808; font-family: var(--font-body); }}
+
+    .ad {{
+        width: {width}px; height: {height}px;
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+        justify-content: center; padding: 80px 80px;
+    }}
+
+    .bg {{
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(0,0,0,0.7) 100%),
+            radial-gradient(ellipse 60% 40% at 30% 40%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 60%),
+            linear-gradient(180deg, #0c0c0c 0%, color-mix(in srgb, var(--primary) 10%, #050505) 100%);
+    }}
+
+    .noise {{
+        position: absolute; inset: 0; opacity: 0.06;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 256px 256px; pointer-events: none; z-index: 1;
+    }}
+
+    .scratches {{
+        position: absolute; inset: 0;
+        background: repeating-linear-gradient(-45deg, transparent, transparent 18px, rgba(255,255,255,0.008) 18px, rgba(255,255,255,0.008) 19px);
+        z-index: 1; pointer-events: none;
+    }}
+
+    .edge-bar {{
+        position: absolute; left: 0; top: 15%; bottom: 15%;
+        width: 5px;
+        background: linear-gradient(180deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
+        z-index: 2;
+    }}
+
+    .content {{ position: relative; z-index: 3; padding-left: 20px; }}
+
+    .eyebrow {{
+        font-family: var(--font-body); font-weight: 600;
+        font-size: 13px; letter-spacing: 0.3em;
+        text-transform: uppercase; color: var(--accent);
+        margin-bottom: 32px; display: flex;
+        align-items: center; gap: 10px;
+    }}
+    .eyebrow::before {{ content: "//"; font-weight: 800; font-size: 15px; opacity: 0.7; }}
+
+    .headline {{
+        font-family: var(--font-heading); font-weight: 900;
+        font-size: clamp(46px, 7.5vw, 78px); color: var(--text-light);
+        line-height: 1.02; letter-spacing: -0.03em;
+        margin-bottom: 32px; max-width: 88%;
+    }}
+
+    .headline em {{
+        font-style: normal; color: var(--accent);
+        text-shadow: 0 0 40px color-mix(in srgb, var(--accent) 30%, transparent);
+    }}
+
+    .subheadline {{
+        font-family: var(--font-body); font-weight: 300;
+        font-size: clamp(17px, 2.2vw, 22px);
+        color: rgba(255,255,255,0.45); line-height: 1.6;
+        max-width: 75%; padding-left: 2px;
+    }}
+
+    .cta-btn {{
+        display: inline-block; margin-top: 40px;
+        background: transparent; border: 1.5px solid var(--accent);
+        color: var(--accent);
+        font-family: var(--font-heading); font-weight: 700;
+        font-size: 14px; padding: 14px 40px; border-radius: 3px;
+        letter-spacing: 0.12em; text-transform: uppercase;
+    }}
+
+    .logo {{
+        position: absolute; bottom: 48px; right: 64px;
+        height: 30px; opacity: 0.4; z-index: 3;
+        filter: brightness(0) invert(1);
+    }}
+
+    .hero-img {{
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; opacity: 0.08; z-index: 0;
+        filter: grayscale(1) contrast(1.2);
+    }}
+</style>
+</head>
+<body>
+<div class="ad">
+    <div class="bg"></div>
+    {hero_image_html}
+    <div class="noise"></div>
+    <div class="scratches"></div>
+    <div class="edge-bar"></div>
+
+    <div class="content">
+        <div class="eyebrow">Sound familiar?</div>
+        <h1 class="headline">{headline}</h1>
+        <p class="subheadline">{subheadline}</p>
+        <div class="cta-btn">{cta}</div>
+    </div>
+
+    {logo_html}
+</div>
+</body>
+</html>

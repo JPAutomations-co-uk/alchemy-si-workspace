@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{brand_name} — Split Reveal</title>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --text-dark: {text_dark};
+    --bg: {bg_color};
+    --font-heading: '{heading_font}', 'Inter', sans-serif;
+    --font-body: '{body_font}', 'Inter', sans-serif;
+}}
+html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+body {{
+    position: relative;
+    font-family: var(--font-body);
+    background: var(--bg);
+}}
+
+/* Background content — left half */
+.bg-left {{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: var(--primary);
+    z-index: 1;
+}}
+
+/* Background content — right half */
+.bg-right {{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: var(--bg, #f8f8f2);
+    z-index: 1;
+}}
+
+/* Decorative large circle centered at divider */
+.center-circle {{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 320px;
+    height: 320px;
+    margin-top: -160px;
+    margin-left: -160px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    opacity: 0.1;
+    z-index: 3;
+}}
+
+/* Vertical divider line */
+.divider-line {{
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: var(--accent);
+    z-index: 4;
+    transform: scaleY(0);
+    transform-origin: center;
+    animation: scaleInY 0.6s cubic-bezier(0.22,1,0.36,1) forwards 1.4s;
+}}
+
+/* Left content */
+.left-content {{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+}}
+
+/* Logo */
+.logo-top {{
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 44px 52px;
+    z-index: 6;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 1.6s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}}
+
+.logo-top img {{
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}}
+
+.headline {{
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 52px;
+    color: var(--text-light);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    max-width: 280px;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 1.8s;
+}}
+
+/* Right content */
+.right-content {{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 60px;
+}}
+
+.subheadline {{
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 20px;
+    color: var(--text-dark);
+    line-height: 1.55;
+    max-width: 240px;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 2.1s;
+}}
+
+.cta-btn {{
+    display: inline-block;
+    margin-top: 24px;
+    padding: 14px 32px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 2.4s;
+}}
+
+/* Brand name bottom */
+.brand-bottom {{
+    position: absolute;
+    bottom: 44px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards 3.0s;
+}}
+
+/* Cover panels that slide apart */
+.panel-left {{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: var(--primary);
+    z-index: 20;
+    animation: revealLeft 1s cubic-bezier(0.77,0,0.18,1) forwards 0.5s;
+}}
+
+.panel-right {{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: var(--secondary);
+    z-index: 20;
+    animation: revealRight 1s cubic-bezier(0.77,0,0.18,1) forwards 0.5s;
+}}
+
+/* Keyframes */
+@keyframes revealLeft {{
+    from {{ transform: translateX(0); }}
+    to {{ transform: translateX(-101%); }}
+}}
+
+@keyframes revealRight {{
+    from {{ transform: translateX(0); }}
+    to {{ transform: translateX(101%); }}
+}}
+
+@keyframes fadeIn {{
+    from {{ opacity: 0; }}
+    to {{ opacity: 1; }}
+}}
+
+@keyframes fadeUp {{
+    from {{ opacity: 0; transform: translateY(28px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+}}
+
+@keyframes scaleInY {{
+    from {{ transform: scaleY(0); }}
+    to {{ transform: scaleY(1); }}
+}}
+</style>
+</head>
+<body>
+
+<!-- Background halves (rendered before cover panels) -->
+<div class="bg-left"></div>
+<div class="bg-right"></div>
+
+<!-- Decorative center circle -->
+<div class="center-circle"></div>
+
+<!-- Vertical divider -->
+<div class="divider-line"></div>
+
+<!-- Left content -->
+<div class="logo-top">
+    {logo_html}
+</div>
+
+<div class="left-content">
+    <div class="headline">{headline}</div>
+</div>
+
+<!-- Right content -->
+<div class="right-content">
+    <div class="subheadline">{subheadline}</div>
+    <button class="cta-btn">{cta}</button>
+</div>
+
+<!-- Brand name bottom center -->
+<div class="brand-bottom">{brand_name}</div>
+
+<!-- Cover panels (slide away on load) -->
+<div class="panel-left"></div>
+<div class="panel-right"></div>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --bg: {bg_color};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{
+        font-family: var(--font-body);
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+    }}
+
+    .top-section {{
+        flex: 0 0 58%; position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: flex-start;
+        padding: 80px 80px 60px;
+    }}
+
+    .top-bg {{
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 50% 50% at 80% 20%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 70%),
+            linear-gradient(160deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 80%, var(--secondary)) 100%);
+    }}
+
+    .top-noise {{
+        position: absolute; inset: 0; opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 256px 256px; pointer-events: none;
+    }}
+
+    .top-section::after {{
+        content: ''; position: absolute;
+        bottom: -1px; left: 0; right: 0; height: 4px;
+        background: var(--accent);
+    }}
+
+    .logo {{
+        position: absolute; top: 48px; right: 64px;
+        height: 32px; object-fit: contain; opacity: 0.6;
+        filter: brightness(0) invert(1); z-index: 2;
+    }}
+
+    .eyebrow {{
+        font-family: var(--font-body); font-size: 13px;
+        font-weight: 500; color: var(--accent);
+        letter-spacing: 0.22em; text-transform: uppercase;
+        margin-bottom: 20px; position: relative; z-index: 1;
+        display: flex; align-items: center; gap: 10px;
+    }}
+    .eyebrow::before {{
+        content: ""; width: 24px; height: 1.5px; background: var(--accent);
+    }}
+
+    .headline {{
+        font-family: var(--font-heading); font-size: clamp(44px, 6.5vw, 60px);
+        font-weight: 900; color: var(--text-light);
+        line-height: 1.08; max-width: 780px;
+        letter-spacing: -0.01em; position: relative; z-index: 1;
+    }}
+
+    .subheadline {{
+        font-family: var(--font-body); font-size: 20px;
+        font-weight: 300; color: rgba(255,255,255,0.6);
+        max-width: 600px; line-height: 1.5;
+        margin-top: 24px; position: relative; z-index: 1;
+    }}
+
+    .hero-img {{
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; opacity: 0.1; z-index: 0;
+    }}
+
+    .bottom-section {{
+        flex: 0 0 42%;
+        background: var(--accent);
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 40px 80px; position: relative;
+    }}
+
+    /* Subtle pattern overlay on CTA area */
+    .bottom-section::before {{
+        content: ""; position: absolute; inset: 0;
+        background: repeating-linear-gradient(
+            135deg, transparent, transparent 20px,
+            rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 21px
+        );
+        pointer-events: none;
+    }}
+
+    .cta-big {{
+        font-family: var(--font-heading); font-size: clamp(36px, 5.5vw, 52px);
+        font-weight: 900; color: white;
+        text-transform: uppercase; text-align: center;
+        letter-spacing: 0.02em; line-height: 1.08;
+        position: relative; z-index: 1;
+    }}
+
+    .cta-sub {{
+        font-family: var(--font-body); font-size: 15px;
+        font-weight: 400; color: rgba(255,255,255,0.65);
+        margin-top: 10px; letter-spacing: 0.1em;
+        text-transform: uppercase; text-align: center;
+        position: relative; z-index: 1;
+    }}
+</style>
+</head>
+<body>
+    <div class="top-section">
+        <div class="top-bg"></div>
+        {hero_image_html}
+        <div class="top-noise"></div>
+        {logo_html}
+        <div class="eyebrow">{brand_name}</div>
+        <h1 class="headline">{headline}</h1>
+        <p class="subheadline">{subheadline}</p>
+    </div>
+
+    <div class="bottom-section">
+        <div class="cta-big">{cta}</div>
+        <div class="cta-sub">Limited Time</div>
+    </div>
+</body>
+</html>

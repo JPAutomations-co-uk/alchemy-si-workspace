@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --bg: {bg_color};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{
+        background: var(--primary);
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        font-family: var(--font-body);
+        position: relative; overflow: hidden;
+    }}
+
+    .bg {{
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 60% 50% at 50% 40%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%),
+            linear-gradient(160deg, var(--primary) 0%, var(--secondary) 100%);
+    }}
+
+    .noise {{
+        position: absolute; inset: 0; opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 256px 256px; pointer-events: none; z-index: 1;
+    }}
+
+    /* Background text watermark */
+    .free-outline {{
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -52%);
+        font-family: var(--font-heading); font-size: 260px;
+        font-weight: 900; color: transparent;
+        -webkit-text-stroke: 2px rgba(255,255,255,0.06);
+        letter-spacing: -0.02em; white-space: nowrap;
+        user-select: none; pointer-events: none; z-index: 0;
+    }}
+
+    /* Accent glow ring */
+    .glow-ring {{
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -48%);
+        width: 380px; height: 380px; border-radius: 50%;
+        background: radial-gradient(circle, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 65%);
+        z-index: 1; pointer-events: none;
+    }}
+
+    .content {{
+        display: flex; flex-direction: column;
+        align-items: center; z-index: 2;
+        padding: 60px 80px 140px; gap: 0; width: 100%;
+    }}
+
+    .free-label {{
+        font-family: var(--font-body); font-size: 15px;
+        font-weight: 500; color: var(--accent);
+        letter-spacing: 0.3em; text-transform: uppercase;
+    }}
+
+    .free-text {{
+        font-family: var(--font-heading); font-size: clamp(140px, 22vw, 220px);
+        font-weight: 900; line-height: 0.85; letter-spacing: -0.04em;
+        text-align: center;
+        background: linear-gradient(180deg, var(--accent) 20%, color-mix(in srgb, var(--accent) 70%, white) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 4px 30px color-mix(in srgb, var(--accent) 30%, transparent));
+    }}
+
+    .offer-divider {{
+        width: 80px; height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        margin: 28px auto;
+    }}
+
+    .subheadline {{
+        font-family: var(--font-body); font-size: clamp(22px, 3vw, 30px);
+        font-weight: 300; color: rgba(255,255,255,0.7);
+        text-align: center; max-width: 680px; line-height: 1.4;
+    }}
+
+    .cta-wrap {{
+        position: absolute; bottom: 64px;
+        left: 0; right: 0;
+        display: flex; align-items: center;
+        justify-content: center; gap: 40px;
+        z-index: 3; padding: 0 80px;
+    }}
+
+    .cta-btn {{
+        background: var(--accent); color: white;
+        font-family: var(--font-heading); font-size: 20px;
+        font-weight: 800; padding: 18px 56px;
+        border-radius: 8px; letter-spacing: 0.06em;
+        text-transform: uppercase;
+        box-shadow: 0 8px 40px color-mix(in srgb, var(--accent) 35%, transparent);
+    }}
+
+    .logo {{
+        position: absolute; bottom: 56px; right: 72px;
+        height: 32px; object-fit: contain; opacity: 0.6;
+        z-index: 3; filter: brightness(0) invert(1);
+    }}
+
+    .hero-img {{
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; opacity: 0.08; z-index: 0;
+    }}
+</style>
+</head>
+<body>
+    <div class="bg"></div>
+    {hero_image_html}
+    <div class="noise"></div>
+    <div class="free-outline" aria-hidden="true">FREE</div>
+    <div class="glow-ring"></div>
+
+    <div class="content">
+        <div class="free-label">Get It</div>
+        <div class="free-text">FREE</div>
+        <div class="offer-divider"></div>
+        <div class="subheadline">{subheadline}</div>
+    </div>
+
+    <div class="cta-wrap">
+        <div class="cta-btn">{cta}</div>
+    </div>
+
+    {logo_html}
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width={width}, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@400;600;700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        :root {{
+            --primary: {primary_color};
+            --secondary: {secondary_color};
+            --accent: {accent_color};
+            --text-light: {text_light};
+            --text-dark: {text_dark};
+            --bg: {bg_color};
+            --font-heading: '{heading_font}', 'Inter', sans-serif;
+            --font-body: '{body_font}', 'Inter', sans-serif;
+        }}
+        html, body {{
+            width: {width}px;
+            height: {height}px;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }}
+        .slide {{
+            width: {width}px;
+            height: {height}px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 72px;
+            position: relative;
+            overflow: hidden;
+        }}
+
+        /* === HOOK SLIDE === */
+        .slide-hook {{
+            background: var(--primary);
+            align-items: center;
+            text-align: center;
+        }}
+        .slide-hook .big-number {{
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: 200px;
+            line-height: 0.85;
+            color: var(--accent);
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }}
+        .slide-hook .headline {{
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: clamp(32px, 5vw, 48px);
+            line-height: 1.15;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+        }}
+
+        /* === LIST ITEM SLIDES === */
+        .slide-list-item {{
+            background: var(--bg);
+            align-items: flex-start;
+        }}
+        .slide-list-item .item-number {{
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: 36px;
+            color: var(--text-light);
+            margin-bottom: 32px;
+            flex-shrink: 0;
+        }}
+        .slide-list-item .headline {{
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: clamp(36px, 5vw, 52px);
+            line-height: 1.1;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }}
+        .slide-list-item .body {{
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: clamp(18px, 2.5vw, 24px);
+            line-height: 1.5;
+            color: #555;
+        }}
+
+        /* === CTA SLIDE === */
+        .slide-cta {{
+            background: var(--accent);
+            align-items: center;
+            text-align: center;
+        }}
+        .slide-cta .headline {{
+            font-family: var(--font-heading);
+            font-weight: 900;
+            font-size: clamp(40px, 6vw, 64px);
+            line-height: 1.1;
+            color: var(--text-light);
+            margin-bottom: 24px;
+        }}
+        .slide-cta .body {{
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: clamp(18px, 2.5vw, 24px);
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 40px;
+        }}
+        .slide-cta .cta-button {{
+            display: inline-block;
+            padding: 18px 48px;
+            border: 2px solid var(--text-light);
+            color: var(--text-light);
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 4px;
+        }}
+
+        /* === SHARED === */
+        .logo {{
+            position: absolute;
+            bottom: 40px;
+            right: 48px;
+            height: 28px;
+            opacity: 0.7;
+        }}
+        .slide-indicator {{
+            position: absolute;
+            bottom: 40px;
+            left: 48px;
+            display: flex;
+            gap: 6px;
+        }}
+        .slide-indicator .dot {{
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+        }}
+        .slide-indicator .dot.active {{
+            background: rgba(255, 255, 255, 0.9);
+            width: 24px;
+            border-radius: 4px;
+        }}
+        .slide-list-item .slide-indicator .dot {{
+            background: rgba(0, 0, 0, 0.15);
+        }}
+        .slide-list-item .slide-indicator .dot.active {{
+            background: var(--accent);
+        }}
+    </style>
+</head>
+<body>
+    <div class="slide {slide_class}">
+        {slide_content}
+    </div>
+</body>
+</html>

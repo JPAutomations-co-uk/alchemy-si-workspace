@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    :root {{
+        --primary: {primary_color};
+        --secondary: {secondary_color};
+        --accent: {accent_color};
+        --text-light: {text_light};
+        --text-dark: {text_dark};
+        --font-heading: '{heading_font}', 'Inter', sans-serif;
+        --font-body: '{body_font}', 'Inter', sans-serif;
+    }}
+    html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+    body {{
+        background: color-mix(in srgb, #0a0a0a 75%, var(--primary));
+        font-family: var(--font-body);
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+    }}
+
+    .noise {{
+        position: absolute; inset: 0; opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 256px 256px; pointer-events: none; z-index: 1;
+    }}
+
+    .urgency-bar {{
+        flex-shrink: 0; height: 52px;
+        background: var(--accent);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 3;
+    }}
+    .urgency-text {{
+        font-family: var(--font-heading); font-size: 14px;
+        font-weight: 800; color: white;
+        letter-spacing: 0.22em; text-transform: uppercase;
+    }}
+
+    .main {{
+        flex: 1; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 60px 80px; gap: 28px; position: relative;
+    }}
+
+    .bg-radial {{
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 65%);
+        pointer-events: none;
+    }}
+
+    /* Ring behind timer */
+    .timer-ring {{
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -52%);
+        width: 320px; height: 320px; border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+        z-index: 1; pointer-events: none;
+    }}
+
+    .time-display {{
+        font-family: var(--font-heading); font-size: clamp(64px, 10vw, 90px);
+        font-weight: 900; line-height: 1; text-align: center; z-index: 2;
+        background: linear-gradient(180deg, var(--accent) 20%, color-mix(in srgb, var(--accent) 60%, white) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 4px 20px color-mix(in srgb, var(--accent) 25%, transparent));
+    }}
+
+    .time-label {{
+        font-family: var(--font-body); font-size: 13px;
+        font-weight: 500; color: color-mix(in srgb, var(--accent) 60%, transparent);
+        letter-spacing: 0.25em; text-transform: uppercase;
+        text-align: center; margin-top: -12px; z-index: 2;
+    }}
+
+    .divider {{
+        width: 60px; height: 1px;
+        background: rgba(255,255,255,0.15); z-index: 2;
+    }}
+
+    .headline {{
+        font-family: var(--font-heading); font-size: clamp(32px, 4.5vw, 44px);
+        font-weight: 900; color: var(--text-light);
+        text-align: center; line-height: 1.12; max-width: 700px; z-index: 2;
+    }}
+
+    .subheadline {{
+        font-family: var(--font-body); font-size: 19px;
+        font-weight: 300; color: rgba(255,255,255,0.5);
+        text-align: center; max-width: 560px; line-height: 1.55; z-index: 2;
+    }}
+
+    .cta-btn {{
+        background: var(--accent); color: white;
+        font-family: var(--font-heading); font-size: 20px;
+        font-weight: 800; padding: 18px 60px; border-radius: 6px;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        z-index: 2; margin-top: 4px;
+        box-shadow: 0 8px 32px color-mix(in srgb, var(--accent) 35%, transparent);
+    }}
+
+    .logo {{
+        position: absolute; bottom: 40px; right: 60px;
+        height: 28px; object-fit: contain; opacity: 0.4;
+        filter: brightness(0) invert(1); z-index: 3;
+    }}
+
+    .hero-img {{
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; opacity: 0.06; z-index: 0;
+    }}
+</style>
+</head>
+<body>
+    {hero_image_html}
+    <div class="noise"></div>
+
+    <div class="urgency-bar">
+        <span class="urgency-text">Offer Ends Soon</span>
+    </div>
+
+    <div class="main">
+        <div class="bg-radial"></div>
+        <div class="timer-ring"></div>
+        <div class="time-display">{headline}</div>
+        <div class="time-label">Hours Only</div>
+        <div class="divider"></div>
+        <p class="subheadline">{subheadline}</p>
+        <div class="cta-btn">{cta}</div>
+    </div>
+
+    {logo_html}
+</body>
+</html>

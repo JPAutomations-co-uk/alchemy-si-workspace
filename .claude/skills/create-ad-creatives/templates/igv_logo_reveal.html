@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{brand_name} — Brand Reveal</title>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --text-dark: {text_dark};
+    --bg: {bg_color};
+    --font-heading: '{heading_font}', 'Inter', sans-serif;
+    --font-body: '{body_font}', 'Inter', sans-serif;
+}}
+html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+body {{
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+    font-family: var(--font-body);
+}}
+
+/* Subtle radial glow at center */
+body::before {{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%);
+    pointer-events: none;
+}}
+
+/* SVG decorative lines — absolute positioned */
+.svg-line-tl {{
+    position: absolute;
+    top: 60px;
+    left: 50px;
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+    animation-delay: 0.4s;
+}}
+
+.svg-line-br {{
+    position: absolute;
+    bottom: 60px;
+    right: 50px;
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+    animation-delay: 0.6s;
+}}
+
+.svg-line-tl line,
+.svg-line-br line {{
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    animation: lineReveal 1.2s cubic-bezier(0.22,1,0.36,1) forwards;
+}}
+
+.svg-line-tl line {{ animation-delay: 0.5s; }}
+.svg-line-br line {{ animation-delay: 0.7s; }}
+
+/* Horizontal SVG bars flanking logo area */
+.logo-lines {{
+    position: relative;
+    width: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+}}
+
+.logo-lines svg.bar-line {{
+    position: absolute;
+}}
+
+.logo-lines svg.bar-line.top-bar {{
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+}}
+
+.logo-lines svg.bar-line.bottom-bar {{
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+}}
+
+.bar-line line {{
+    stroke: var(--accent);
+    stroke-width: 1px;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: lineReveal 1s cubic-bezier(0.22,1,0.36,1) forwards;
+}}
+
+.bar-line.top-bar line {{ animation-delay: 0.3s; }}
+.bar-line.bottom-bar line {{ animation-delay: 0.5s; }}
+
+/* Logo */
+.logo-wrap {{
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: scaleFromCenter 0.9s cubic-bezier(0.22,1,0.36,1) forwards;
+    animation-delay: 1.2s;
+}}
+
+.logo-wrap img {{
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}}
+
+/* Content stack */
+.content {{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    z-index: 5;
+}}
+
+.brand-name {{
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 32px;
+    color: var(--text-light);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 20px;
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards;
+    animation-delay: 1.8s;
+}}
+
+.divider {{
+    width: 48px;
+    height: 1px;
+    background: var(--accent);
+    margin: 18px auto;
+    transform: scaleX(0);
+    transform-origin: center;
+    animation: scaleInX 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
+    animation-delay: 2.3s;
+}}
+
+.tagline {{
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 20px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 0.02em;
+    max-width: 320px;
+    line-height: 1.5;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards;
+    animation-delay: 2.8s;
+}}
+
+.cta-btn {{
+    display: inline-block;
+    margin-top: 28px;
+    padding: 14px 36px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards;
+    animation-delay: 3.4s;
+}}
+
+/* Floating particles */
+.particle {{
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0;
+}}
+
+.p1 {{ top: 12%; left: 8%; animation: fadeIn 0.5s ease forwards 0.8s; }}
+.p2 {{ top: 18%; right: 12%; animation: fadeIn 0.5s ease forwards 1.0s; }}
+.p3 {{ top: 35%; left: 5%; animation: fadeIn 0.5s ease forwards 1.2s; }}
+.p4 {{ bottom: 22%; left: 10%; animation: fadeIn 0.5s ease forwards 1.4s; }}
+.p5 {{ bottom: 14%; right: 8%; animation: fadeIn 0.5s ease forwards 1.6s; }}
+.p6 {{ top: 60%; right: 6%; animation: fadeIn 0.5s ease forwards 1.8s; }}
+.p7 {{ top: 8%; left: 40%; animation: fadeIn 0.5s ease forwards 2.0s; }}
+.p8 {{ bottom: 8%; left: 45%; animation: fadeIn 0.5s ease forwards 2.2s; }}
+
+/* Keyframes */
+@keyframes fadeIn {{
+    from {{ opacity: 0; }}
+    to {{ opacity: 1; }}
+}}
+
+@keyframes fadeUp {{
+    from {{ opacity: 0; transform: translateY(30px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+}}
+
+@keyframes scaleInX {{
+    from {{ transform: scaleX(0); }}
+    to {{ transform: scaleX(1); }}
+}}
+
+@keyframes scaleFromCenter {{
+    from {{ opacity: 0; transform: scale(0.8); }}
+    to {{ opacity: 1; transform: scale(1); }}
+}}
+
+@keyframes lineReveal {{
+    from {{ stroke-dashoffset: 240; }}
+    to {{ stroke-dashoffset: 0; }}
+}}
+</style>
+</head>
+<body>
+
+<!-- Decorative diagonal SVG — top left -->
+<svg class="svg-line-tl" width="240" height="240" viewBox="0 0 240 240" fill="none">
+    <line x1="0" y1="240" x2="240" y2="0" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="340" stroke-dashoffset="340" style="animation: lineReveal 1.4s cubic-bezier(0.22,1,0.36,1) 0.5s forwards; opacity: 0.4;"/>
+</svg>
+
+<!-- Decorative diagonal SVG — bottom right -->
+<svg class="svg-line-br" width="240" height="240" viewBox="0 0 240 240" fill="none">
+    <line x1="240" y1="0" x2="0" y2="240" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="340" stroke-dashoffset="340" style="animation: lineReveal 1.4s cubic-bezier(0.22,1,0.36,1) 0.7s forwards; opacity: 0.4;"/>
+</svg>
+
+<!-- Floating particles -->
+<div class="particle p1"></div>
+<div class="particle p2"></div>
+<div class="particle p3"></div>
+<div class="particle p4"></div>
+<div class="particle p5"></div>
+<div class="particle p6"></div>
+<div class="particle p7"></div>
+<div class="particle p8"></div>
+
+<!-- Main content -->
+<div class="content">
+    <div class="logo-lines">
+        <!-- Top bar -->
+        <svg class="bar-line top-bar" width="200" height="2" viewBox="0 0 200 2">
+            <line x1="0" y1="1" x2="200" y2="1"/>
+        </svg>
+
+        <!-- Logo image or fallback text -->
+        <div class="logo-wrap">
+            {logo_html}
+        </div>
+
+        <!-- Bottom bar -->
+        <svg class="bar-line bottom-bar" width="200" height="2" viewBox="0 0 200 2">
+            <line x1="0" y1="1" x2="200" y2="1"/>
+        </svg>
+    </div>
+
+    <div class="brand-name">{brand_name}</div>
+
+    <div class="divider"></div>
+
+    <div class="tagline">{subheadline}</div>
+
+    <button class="cta-btn">{cta}</button>
+</div>
+
+</body>
+</html>

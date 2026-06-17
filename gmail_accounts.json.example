@@ -1,0 +1,7 @@
+[
+  {
+    "email": "connect@alchemysi.uk",
+    "token_file": "token_alchemy.json",
+    "credentials_file": "credentials.json"
+  }
+]

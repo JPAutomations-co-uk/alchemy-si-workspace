@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   MAILPULSE v3 — 60s Beat-Switch Walkthrough
+   Audio: asap.mp3 from 3:00, beat switch at 3:25 (25s in)
+   Pre-switch: 123 BPM / 488ms beat / 1951ms bar
+   Post-switch: 96 BPM / 625ms beat / 2500ms bar
+   ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after {{ margin:0; padding:0; box-sizing:border-box; }}
+
+:root {{
+  --snap: cubic-bezier(0.2, 0.0, 0, 1.0);
+  --reveal: cubic-bezier(0.16, 1, 0.3, 1);
+  --lux: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --accent: #2563EB;
+  --accent-light: #3B82F6;
+  --success: #16A34A;
+  --warning: #D97706;
+  --danger: #DC2626;
+  --app-bg: #FAFAFA;
+  --app-card: #FFFFFF;
+  --app-border: #E4E4E7;
+  --app-text: #18181B;
+  --app-text2: #71717A;
+  --app-text3: #A1A1AA;
+}}
+
+html {{ width:{width}px; height:{height}px; overflow:hidden; -webkit-font-smoothing:antialiased; }}
+body {{ width:100%; height:100%; background:#050508; color:#fff; font-family:'Inter',system-ui,sans-serif; }}
+
+/* ── BACKGROUND ── */
+.bg-mesh {{
+  position:fixed; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 35% 30%, rgba(37,99,235,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 70% 65%, rgba(37,99,235,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(10,10,20,1) 0%, #050508 100%);
+}}
+
+.grid-overlay {{
+  position:fixed; inset:0; z-index:1; opacity:0.35;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse at center, white 20%, transparent 70%);
+  -webkit-mask-image:radial-gradient(ellipse at center, white 20%, transparent 70%);
+  pointer-events:none;
+}}
+
+.vignette {{ position:fixed; inset:0; z-index:2; background:radial-gradient(ellipse 70% 60% at 50% 50%, transparent 30%, rgba(0,0,0,0.6) 100%); pointer-events:none; }}
+
+/* ── SCENE LAYERS ── */
+.scene {{
+  position:absolute; inset:0; z-index:10;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  opacity:0; visibility:hidden;
+  transition:opacity 400ms ease;
+}}
+.scene.on {{ opacity:1; visibility:visible; }}
+.scene.fast-on {{ opacity:1; visibility:visible; transition:opacity 150ms ease; }}
+.scene.off {{ opacity:0; visibility:hidden; transition:opacity 300ms ease; }}
+
+/* ── SHARED KEYFRAMES ── */
+@keyframes slamIn {{ 0% {{ opacity:0; transform:scale(1.15) translateY(-10px); }} 100% {{ opacity:1; transform:scale(1) translateY(0); }} }}
+@keyframes slideUp {{ 0% {{ opacity:0; transform:translateY(25px); }} 100% {{ opacity:1; transform:translateY(0); }} }}
+@keyframes slideRight {{ 0% {{ opacity:0; transform:translateX(-20px); }} 100% {{ opacity:1; transform:translateX(0); }} }}
+@keyframes slideFromRight {{ 0% {{ opacity:0; transform:translateX(30px); }} 100% {{ opacity:1; transform:translateX(0); }} }}
+@keyframes pulseRed {{ 0%,100% {{ box-shadow:0 0 0 rgba(220,38,38,0); }} 50% {{ box-shadow:0 0 20px rgba(220,38,38,0.4); }} }}
+@keyframes pulseBlue {{ 0%,100% {{ box-shadow:0 0 0 rgba(37,99,235,0); }} 50% {{ box-shadow:0 0 30px rgba(37,99,235,0.35); }} }}
+@keyframes barRise {{ from {{ transform:scaleY(0); }} to {{ transform:scaleY(1); }} }}
+@keyframes notifPop {{ 0% {{ transform:scale(0); }} 60% {{ transform:scale(1.4); }} 100% {{ transform:scale(1); }} }}
+@keyframes glowRadiate {{ 0% {{ box-shadow:0 0 0 0 rgba(37,99,235,0.4); }} 100% {{ box-shadow:0 0 80px 40px rgba(37,99,235,0); }} }}
+@keyframes snapIn {{ 0% {{ opacity:0; transform:scale(0.8); }} 50% {{ transform:scale(1.03); }} 100% {{ opacity:1; transform:scale(1); }} }}
+@keyframes flashWhite {{ 0% {{ opacity:0; }} 10% {{ opacity:0.15; }} 100% {{ opacity:0; }} }}
+@keyframes cursorPulse {{ 0%,100% {{ transform:translate(-50%,-50%) scale(1); }} 50% {{ transform:translate(-50%,-50%) scale(1.2); }} }}
+@keyframes rowPulse {{ 0%,100% {{ background:transparent; }} 50% {{ background:rgba(220,38,38,0.08); }} }}
+
+/* ═══ SCENE 1: HOOK (0-5s) ═══ */
+.hook-text {{ text-align:center; }}
+.hook-line {{
+  font-family:'Space Grotesk',system-ui,sans-serif; font-weight:700; font-size:54px;
+  color:#fff; letter-spacing:-0.02em; line-height:1.25;
+}}
+.hook-word {{ display:inline-block; opacity:0; }}
+.hook-word.in {{ animation:slamIn 300ms var(--snap) forwards; }}
+.hook-red {{ color:var(--danger); text-shadow:0 0 30px rgba(220,38,38,0.4); }}
+.hook-stat {{
+  font-family:'Space Grotesk',system-ui,sans-serif; font-size:140px; font-weight:800;
+  color:var(--danger); opacity:0; letter-spacing:-0.04em; margin-bottom:8px;
+}}
+.hook-stat.in {{ animation:slamIn 400ms var(--snap) forwards; }}
+.hook-stat-label {{ font-size:20px; color:rgba(255,255,255,0.5); opacity:0; }}
+.hook-stat-label.in {{ animation:slideUp 350ms var(--reveal) forwards; }}
+
+/* ═══ SCENE 2: COST (5-10s) ═══ */
+.cost-grid {{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:900px; }}
+.cost-card {{
+  background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px; padding:28px 24px; text-align:center; opacity:0;
+}}
+.cost-card.in {{ animation:slideUp 350ms var(--snap) forwards; }}
+.cost-num {{ font-family:'Space Grotesk',system-ui,sans-serif; font-size:48px; font-weight:700; }}
+.cost-num.red {{ color:var(--danger); }}
+.cost-num.orange {{ color:var(--warning); }}
+.cost-num.dim {{ color:rgba(255,255,255,0.15); }}
+.cost-label {{ font-size:12px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-top:6px; }}
+.cost-headline {{
+  font-family:'Space Grotesk',system-ui,sans-serif; font-size:36px; font-weight:700;
+  color:var(--warning); margin-bottom:36px; opacity:0;
+}}
+.cost-headline.in {{ animation:slamIn 350ms var(--snap) forwards; }}
+
+/* ═══ SCENE 3: DASHBOARD CHAOS (10-17s) ═══ */
+.app-frame {{
+  width:1580px; height:860px; background:var(--app-bg);
+  border-radius:12px; overflow:hidden; display:flex; flex-direction:column;
+  border:1px solid rgba(255,255,255,0.06);
+  box-shadow:0 25px 80px rgba(0,0,0,0.5);
+  opacity:0;
+}}
+.app-frame.in {{ animation:slideUp 500ms var(--reveal) forwards; }}
+.chrome {{ height:34px; background:#fff; border-bottom:1px solid var(--app-border); display:flex; align-items:center; padding:0 14px; gap:7px; flex-shrink:0; }}
+.dot {{ width:10px; height:10px; border-radius:50%; }}
+.dot-r {{ background:#FF5F57; }} .dot-y {{ background:#FFBD2E; }} .dot-g {{ background:#28C840; }}
+.url-bar {{ flex:1; margin-left:8px; height:20px; background:#F4F4F5; border-radius:5px; display:flex; align-items:center; padding:0 10px; font-size:11px; color:var(--app-text3); }}
+.app-inner {{ display:flex; flex:1; overflow:hidden; }}
+
+/* Sidebar */
+.sb {{ width:190px; background:#fff; border-right:1px solid var(--app-border); padding:14px 10px; flex-shrink:0; opacity:0; }}
+.sb.in {{ animation:slideRight 300ms var(--reveal) forwards; }}
+.sb-logo {{ font-family:'Space Grotesk',system-ui,sans-serif; font-weight:700; font-size:15px; color:var(--app-text); padding:4px 8px 14px; display:flex; align-items:center; gap:7px; }}
+.sb-icon {{ width:22px; height:22px; border-radius:5px; background:linear-gradient(135deg,var(--accent-light),var(--accent)); display:flex; align-items:center; justify-content:center; }}
+.sb-icon svg {{ stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; width:13px; height:13px; }}
+.sb-nav {{ display:flex; flex-direction:column; gap:1px; }}
+.sb-item {{ display:flex; align-items:center; gap:7px; padding:6px 8px; border-radius:6px; font-size:12px; color:var(--app-text2); transition:all 200ms ease; position:relative; }}
+.sb-item.active {{ background:rgba(37,99,235,0.1); color:var(--accent); font-weight:500; }}
+.sb-item svg {{ width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }}
+.sb-notif {{ position:absolute; right:7px; top:50%; width:7px; height:7px; border-radius:50%; background:var(--danger); transform:translateY(-50%) scale(0); }}
+.sb-notif.pop {{ animation:notifPop 300ms var(--snap) forwards; }}
+
+/* Main content area */
+.main {{ flex:1; padding:16px 20px; overflow:hidden; position:relative; }}
+
+/* Content panels */
+.panel {{ position:absolute; inset:0; padding:16px 20px; opacity:0; transition:opacity 300ms ease; pointer-events:none; }}
+.panel.on {{ opacity:1; pointer-events:auto; }}
+
+.pg-head {{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; opacity:0; }}
+.pg-head.in {{ animation:slideUp 250ms var(--reveal) forwards; }}
+.pg-title {{ font-family:'Space Grotesk',system-ui,sans-serif; font-weight:700; font-size:17px; color:var(--app-text); }}
+.pg-sub {{ font-size:11px; color:var(--app-text2); margin-top:1px; }}
+.drp {{ display:flex; background:#F4F4F5; border-radius:6px; padding:2px; }}
+.drp-b {{ padding:3px 9px; border-radius:4px; font-size:10px; font-weight:500; color:var(--app-text2); background:transparent; border:none; font-family:inherit; }}
+.drp-b.on {{ background:#fff; color:var(--app-text); box-shadow:0 1px 2px rgba(0,0,0,0.08); }}
+
+/* KPI cards */
+.kpi-row {{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:12px; }}
+.kpi {{ background:var(--app-card); border:1px solid var(--app-border); border-radius:9px; padding:12px 14px; box-shadow:0 1px 2px rgba(0,0,0,0.03); opacity:0; }}
+.kpi.in {{ animation:slideUp 300ms var(--snap) forwards; }}
+.kpi-l {{ font-size:9px; font-weight:500; color:var(--app-text3); text-transform:uppercase; letter-spacing:0.07em; }}
+.kpi-v {{ font-family:'Space Grotesk',system-ui,sans-serif; font-size:22px; font-weight:700; margin-top:3px; }}
+.kpi-s {{ font-size:9px; color:var(--app-text2); margin-top:1px; }}
+
+/* Chart row */
+.chart-row {{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }}
+.chart {{ background:var(--app-card); border:1px solid var(--app-border); border-radius:9px; padding:12px 14px; box-shadow:0 1px 2px rgba(0,0,0,0.03); opacity:0; }}
+.chart.in {{ animation:slideUp 350ms var(--snap) forwards; }}
+.chart-t {{ font-size:11px; font-weight:500; color:var(--app-text2); margin-bottom:8px; }}
+
+/* Bar chart */
+.bars {{ display:flex; align-items:flex-end; gap:6px; height:100px; }}
+.bar-g {{ display:flex; flex-direction:column; align-items:center; flex:1; height:100%; justify-content:flex-end; }}
+.bar-p {{ display:flex; gap:2px; align-items:flex-end; width:100%; justify-content:center; }}
+.bar {{ width:12px; border-radius:2px 2px 0 0; transform-origin:bottom; transform:scaleY(0); }}
+.bar.b {{ background:var(--accent); }}
+.bar.g {{ background:var(--success); }}
+.bar.up {{ transform:scaleY(1); transition:transform 400ms var(--snap); }}
+.bar-d {{ font-size:8px; color:var(--app-text3); margin-top:3px; }}
+
+/* Heatmap */
+.hm {{ display:flex; gap:2px; }}
+.hm-c {{ flex:1; aspect-ratio:1; border-radius:2px; background:#F4F4F5; opacity:0; transform:scale(0.5); }}
+.hm-c.in {{ opacity:1; transform:scale(1); transition:all 150ms var(--snap); }}
+.hm-c.h1 {{ background:#DBEAFE; }} .hm-c.h2 {{ background:#93C5FD; }} .hm-c.h3 {{ background:#3B82F6; }} .hm-c.h4 {{ background:#1D4ED8; }}
+
+/* Staff table */
+.st-card {{ background:var(--app-card); border:1px solid var(--app-border); border-radius:9px; box-shadow:0 1px 2px rgba(0,0,0,0.03); overflow:hidden; opacity:0; }}
+.st-card.in {{ animation:slideUp 350ms var(--snap) forwards; }}
+.st-head {{ display:grid; grid-template-columns:1.5fr 1fr 1fr 0.8fr 1fr; border-bottom:1px solid var(--app-border); padding:7px 14px; font-size:9px; font-weight:500; color:var(--app-text3); text-transform:uppercase; letter-spacing:0.06em; }}
+.st-head span:not(:first-child) {{ text-align:right; }}
+.st-row {{ display:grid; grid-template-columns:1.5fr 1fr 1fr 0.8fr 1fr; padding:8px 14px; border-bottom:1px solid #F4F4F5; opacity:0; }}
+.st-row.in {{ animation:slideRight 250ms var(--snap) forwards; }}
+.st-row.danger {{ animation:rowPulse 1.2s ease 1; }}
+.rn {{ font-size:12px; font-weight:500; color:var(--app-text); }}
+.re {{ font-size:9px; color:var(--app-text3); }}
+.rc {{ font-size:12px; font-weight:500; text-align:right; }}
+.cg {{ color:var(--success); }} .co {{ color:var(--warning); }} .cr {{ color:var(--danger); }} .cd {{ color:var(--app-text); }}
+
+/* Unanswered rows */
+.ua-card {{ background:var(--app-card); border:1px solid var(--app-border); border-radius:9px; box-shadow:0 1px 2px rgba(0,0,0,0.03); overflow:hidden; }}
+.ua-r {{ display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid #F4F4F5; opacity:0; }}
+.ua-r.in {{ animation:slideFromRight 300ms var(--snap) forwards; }}
+.ua-f {{ font-size:12px; font-weight:500; color:var(--app-text); }}
+.ua-t {{ font-size:9px; color:var(--app-text3); margin-top:1px; }}
+.badge {{ padding:3px 9px; border-radius:100px; font-size:10px; font-weight:600; white-space:nowrap; }}
+.badge-r {{ background:rgba(220,38,38,0.1); color:var(--danger); }}
+.badge-o {{ background:rgba(217,119,6,0.1); color:var(--warning); }}
+.badge-g {{ background:rgba(22,163,74,0.1); color:var(--success); }}
+.badge.pulse {{ animation:pulseRed 1.2s ease infinite; }}
+
+/* Settings */
+.set-sec {{ background:var(--app-card); border:1px solid var(--app-border); border-radius:9px; box-shadow:0 1px 2px rgba(0,0,0,0.03); overflow:hidden; margin-bottom:10px; opacity:0; }}
+.set-sec.in {{ animation:slideUp 350ms var(--snap) forwards; }}
+.set-h {{ display:flex; justify-content:space-between; align-items:center; padding:10px 14px; }}
+.set-ht {{ font-size:12px; font-weight:600; color:var(--app-text); }}
+.sync-b {{ font-size:10px; font-weight:500; color:var(--accent); }}
+.ac-r {{ display:flex; align-items:center; padding:8px 14px; border-top:1px solid #F4F4F5; gap:8px; opacity:0; }}
+.ac-r.in {{ animation:slideUp 200ms var(--snap) forwards; }}
+.ac-i {{ width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; }}
+.ac-i.gg {{ background:#FEE2E2; color:#DC2626; }} .ac-i.ms {{ background:#DBEAFE; color:#2563EB; }}
+.ac-n {{ font-size:11px; font-weight:500; color:var(--app-text); }}
+.ac-e {{ font-size:9px; color:var(--app-text3); }}
+.ac-s {{ font-size:9px; color:var(--app-text3); margin-left:auto; }}
+.sl-r {{ display:flex; align-items:center; padding:6px 14px; border-top:1px solid #F4F4F5; gap:6px; opacity:0; }}
+.sl-r.in {{ opacity:1; transition:opacity 200ms ease; }}
+.sl-d {{ width:5px; height:5px; border-radius:50%; background:var(--success); flex-shrink:0; }}
+.sl-t {{ font-size:10px; color:var(--app-text); }}
+.sl-c {{ font-size:9px; color:var(--app-text3); }}
+.sl-tm {{ font-size:9px; color:var(--app-text3); margin-left:auto; }}
+
+/* Animated cursor */
+#cur {{ position:absolute; z-index:100; width:14px; height:14px; background:var(--accent); border-radius:50%; box-shadow:0 0 12px rgba(37,99,235,0.5); opacity:0; pointer-events:none; transform:translate(-50%,-50%); animation:cursorPulse 1.2s ease infinite; transition:left 600ms cubic-bezier(0.4,0,0.2,1), top 600ms cubic-bezier(0.4,0,0.2,1); }}
+
+/* Text overlay pill */
+.overlay {{ position:absolute; bottom:28px; left:28px; z-index:50; background:rgba(0,0,0,0.65); backdrop-filter:blur(10px); border-radius:7px; padding:7px 14px; font-size:13px; color:rgba(255,255,255,0.85); opacity:0; transform:translateY(6px); transition:all 350ms var(--reveal); }}
+.overlay.in {{ opacity:1; transform:translateY(0); }}
+
+/* ═══ SCENE 5: BLACKOUT ═══ */
+#blackout {{ background:#000; z-index:20; }}
+.flash {{ position:absolute; inset:0; background:#fff; animation:flashWhite 500ms ease forwards; }}
+
+/* ═══ SCENE 6: LOGO REVEAL ═══ */
+.logo-reveal {{ display:flex; align-items:center; gap:16px; opacity:0; }}
+.logo-reveal.in {{ animation:snapIn 500ms var(--snap) forwards; }}
+.lr-icon {{ width:56px; height:56px; border-radius:15px; background:linear-gradient(135deg,var(--accent-light),var(--accent)); display:flex; align-items:center; justify-content:center; box-shadow:0 0 50px rgba(37,99,235,0.4); }}
+.lr-icon svg {{ stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; width:28px; height:28px; }}
+.lr-name {{ font-family:'Space Grotesk',system-ui,sans-serif; font-size:56px; font-weight:700; }}
+.lr-tag {{ font-size:20px; color:var(--app-text3); margin-top:8px; opacity:0; }}
+.lr-tag.in {{ animation:slideUp 400ms var(--reveal) forwards; }}
+
+/* ═══ SCENE TRUST ═══ */
+.trust-l1 {{ font-family:'Space Grotesk',system-ui,sans-serif; font-weight:700; font-size:48px; color:#fff; opacity:0; }}
+.trust-l1.in {{ animation:slideUp 450ms var(--reveal) forwards; }}
+.trust-l2 {{ font-size:22px; color:var(--app-text3); margin-top:8px; opacity:0; }}
+.trust-l2.in {{ animation:slideUp 400ms var(--reveal) forwards; }}
+.trust-icon {{ opacity:0; margin-bottom:12px; }}
+.trust-icon.in {{ animation:snapIn 400ms var(--snap) forwards; }}
+
+.dream-ln {{ font-family:'Space Grotesk',system-ui,sans-serif; font-size:30px; font-weight:600; color:#fff; display:flex; align-items:center; gap:12px; opacity:0; margin-top:6px; }}
+.dream-ln.in {{ animation:slideRight 400ms var(--reveal) forwards; }}
+.dream-bar {{ width:4px; height:26px; background:var(--accent); border-radius:2px; transform:scaleY(0); transform-origin:top; transition:transform 300ms var(--snap); }}
+.dream-bar.on {{ transform:scaleY(1); }}
+
+/* ═══ SCENE CTA ═══ */
+.cta-logo {{ display:flex; align-items:center; gap:14px; opacity:0; }}
+.cta-logo.in {{ animation:snapIn 600ms var(--snap) forwards; }}
+.cta-i {{ width:50px; height:50px; border-radius:13px; background:linear-gradient(135deg,var(--accent-light),var(--accent)); display:flex; align-items:center; justify-content:center; box-shadow:0 0 40px rgba(37,99,235,0.3); }}
+.cta-i svg {{ stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; width:25px; height:25px; }}
+.cta-n {{ font-family:'Space Grotesk',system-ui,sans-serif; font-size:50px; font-weight:700; }}
+.cta-tg {{ font-size:18px; color:var(--app-text3); margin-top:6px; opacity:0; }}
+.cta-tg.in {{ animation:slideUp 400ms var(--reveal) forwards; }}
+.cta-try {{ font-family:'Space Grotesk',system-ui,sans-serif; font-size:24px; font-weight:600; color:#fff; margin-top:18px; opacity:0; }}
+.cta-try.in {{ animation:slideUp 450ms var(--reveal) forwards; }}
+.cta-try-btn {{ display:inline-block; margin-top:14px; padding:12px 36px; border-radius:8px; background:var(--accent); color:#fff; font-family:'Space Grotesk',system-ui,sans-serif; font-size:16px; font-weight:600; opacity:0; box-shadow:0 0 30px rgba(37,99,235,0.3); }}
+.cta-try-btn.in {{ animation:snapIn 500ms var(--snap) forwards; }}
+.cta-u {{ font-family:'Space Grotesk',system-ui,sans-serif; font-size:14px; font-weight:500; color:var(--app-text3); margin-top:10px; opacity:0; }}
+.cta-u.in {{ opacity:1; transition:opacity 500ms ease; }}
+.cta-glow {{ position:absolute; width:250px; height:250px; border-radius:50%; background:radial-gradient(circle,rgba(37,99,235,0.1),transparent 70%); animation:pulseBlue 2.5s ease-in-out infinite; z-index:-1; }}
+
+/* Feature label overlay */
+.feat-label {{ position:absolute; top:16px; right:20px; z-index:60; background:var(--accent); color:#fff; padding:5px 14px; border-radius:6px; font-family:'Space Grotesk',system-ui,sans-serif; font-size:12px; font-weight:600; letter-spacing:0.03em; opacity:0; transform:translateY(-6px); transition:all 300ms var(--reveal); }}
+.feat-label.in {{ opacity:1; transform:translateY(0); }}
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="grid-overlay"></div>
+<div class="vignette"></div>
+
+<!-- ═══ SCENE 1: HOOK (0-5s) ═══ -->
+<div id="s1" class="scene on">
+  <div class="hook-text">
+    <div class="hook-stat" id="hs">47%</div>
+    <div class="hook-stat-label" id="hsl">of hotel emails go unanswered for 4+ hours</div>
+    <div class="hook-line" style="margin-top:24px">
+      <span class="hook-word" id="hw0">Every</span>
+      <span class="hook-word" id="hw1">missed</span>
+      <span class="hook-word" id="hw2">email</span>
+      <span class="hook-word" id="hw3">is</span>
+      <span class="hook-word" id="hw4">a</span>
+      <span class="hook-word" id="hw5">missed</span>
+      <span class="hook-word hook-red" id="hw6">booking.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 2: COST (5-10s) ═══ -->
+<div id="s2" class="scene">
+  <div class="cost-headline" id="ch">&pound;2,160 lost every week.</div>
+  <div class="cost-grid">
+    <div class="cost-card" id="cc0"><div class="cost-num red">12</div><div class="cost-label">Emails missed / week</div></div>
+    <div class="cost-card" id="cc1"><div class="cost-num orange">&pound;180</div><div class="cost-label">Per missed enquiry</div></div>
+    <div class="cost-card" id="cc2"><div class="cost-num dim">0</div><div class="cost-label">Visibility right now</div></div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 3: DASHBOARD CHAOS (10-24s) ═══ -->
+<div id="s3" class="scene">
+  <div class="app-frame" id="af">
+    <div class="chrome"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="url-bar">mailpulse-lake.vercel.app/dashboard</div></div>
+    <div class="app-inner">
+      <div class="sb" id="sb">
+        <div class="sb-logo"><div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>MailPulse</div>
+        <div class="sb-nav">
+          <div class="sb-item active" id="n0"><svg viewBox="0 0 24 24"><path d="M3 13h2.25v6.75H3zM9.75 7.5h2.25V21h-2.25zM16.5 3h2.25v17.25H16.5z"/></svg>Overview</div>
+          <div class="sb-item" id="n1"><svg viewBox="0 0 24 24"><path d="M15 19.13a9.38 9.38 0 007-3.07M12 6.38a3.38 3.38 0 11-6.75 0 3.38 3.38 0 016.75 0z"/></svg>Staff</div>
+          <div class="sb-item" id="n2"><svg viewBox="0 0 24 24"><path d="M14.86 17.08a23.85 23.85 0 005.45-1.31A8.97 8.97 0 0018 9.75V9A6 6 0 006 9v.75a8.97 8.97 0 01-2.31 6.02c1.73.64 3.56 1.09 5.46 1.31m5.71 0a3 3 0 01-5.71 0"/></svg>Unanswered<div class="sb-notif" id="uaNotif"></div></div>
+          <div class="sb-item" id="n3"><svg viewBox="0 0 24 24"><path d="M9.59 3.94c.09-.54.56-.94 1.11-.94h2.59c.55 0 1.02.4 1.11.94l.21 1.28M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</div>
+        </div>
+      </div>
+      <div class="main">
+        <!-- DASHBOARD PANEL -->
+        <div class="panel on" id="p-dash">
+          <div class="pg-head" id="dh"><div><div class="pg-title">Overview</div><div class="pg-sub">Email performance across your team</div></div><div class="drp"><div class="drp-b">7d</div><div class="drp-b on">14d</div><div class="drp-b">30d</div></div></div>
+          <div class="kpi-row">
+            <div class="kpi" id="k0"><div class="kpi-l">Response Rate</div><div class="kpi-v cg" id="kv0">0%</div><div class="kpi-s">+2 pts vs prev</div></div>
+            <div class="kpi" id="k1"><div class="kpi-l">Avg Response Time</div><div class="kpi-v cg" id="kv1">0m</div><div class="kpi-s">-3m vs prev</div></div>
+            <div class="kpi" id="k2"><div class="kpi-l">Unanswered</div><div class="kpi-v co" id="kv2">0</div><div class="kpi-s">emails need replies</div></div>
+            <div class="kpi" id="k3"><div class="kpi-l">Volume</div><div class="kpi-v cd" id="kv3">0</div><div class="kpi-s">312 in / 535 out</div></div>
+          </div>
+          <div class="chart-row">
+            <div class="chart" id="chBar"><div class="chart-t">Daily Volume</div><div class="bars" id="bars"></div></div>
+            <div class="chart" id="chHeat"><div class="chart-t">Inbound by Hour</div><div class="hm" id="hm"></div></div>
+          </div>
+          <div class="st-card" id="stc">
+            <div style="padding:10px 14px 6px;font-size:11px;font-weight:500;color:#71717A">Staff Performance</div>
+            <div class="st-head"><span>Account</span><span>Response</span><span>Avg Time</span><span>Unanswered</span><span>Volume</span></div>
+            <div class="st-row" id="r0"><div><div class="rn">James Mitchell</div><div class="re">james@thegrandhotel.co.uk</div></div><div class="rc cg">95.2%</div><div class="rc" style="color:#71717A">12m</div><div class="rc cg">0</div><div class="rc cd">156</div></div>
+            <div class="st-row" id="r1"><div><div class="rn">Sophie Turner</div><div class="re">sophie@thegrandhotel.co.uk</div></div><div class="rc cg">91.4%</div><div class="rc" style="color:#71717A">18m</div><div class="rc cg">0</div><div class="rc cd">142</div></div>
+            <div class="st-row" id="r2"><div><div class="rn">Oliver Chen</div><div class="re">oliver@thegrandhotel.co.uk</div></div><div class="rc co">82.1%</div><div class="rc" style="color:#71717A">35m</div><div class="rc co">1</div><div class="rc cd">138</div></div>
+            <div class="st-row" id="r3"><div><div class="rn">Emma Williams</div><div class="re">emma@thegrandhotel.co.uk</div></div><div class="rc cg">89.0%</div><div class="rc" style="color:#71717A">22m</div><div class="rc cg">0</div><div class="rc cd">145</div></div>
+            <div class="st-row" id="r4"><div><div class="rn">Daniel Okafor</div><div class="re">daniel@thegrandhotel.co.uk</div></div><div class="rc cg">94.1%</div><div class="rc" style="color:#71717A">14m</div><div class="rc cg">0</div><div class="rc cd">148</div></div>
+            <div class="st-row" id="r5"><div><div class="rn">Priya Sharma</div><div class="re">priya@thegrandhotel.co.uk</div></div><div class="rc cr">68.3%</div><div class="rc" style="color:#71717A">52m</div><div class="rc cr">2</div><div class="rc cd">118</div></div>
+          </div>
+        </div>
+        <!-- UNANSWERED PANEL -->
+        <div class="panel" id="p-ua">
+          <div class="pg-head" id="uah"><div><div class="pg-title">Unanswered</div><div class="pg-sub">3 email(s) waiting for a reply</div></div></div>
+          <div class="ua-card">
+            <div class="ua-r" id="u0"><div><div class="ua-f">events@corporate-solutions.co.uk</div><div class="ua-t">To: Oliver Chen</div></div><div class="badge badge-r" id="ub0">5h 23m</div></div>
+            <div class="ua-r" id="u1"><div><div class="ua-f">guest.complaint@gmail.com</div><div class="ua-t">To: Priya Sharma</div></div><div class="badge badge-o">2h 45m</div></div>
+            <div class="ua-r" id="u2"><div><div class="ua-f">travel.agent@luxurytravel.com</div><div class="ua-t">To: Priya Sharma</div></div><div class="badge badge-g">47m</div></div>
+          </div>
+        </div>
+        <!-- SETTINGS PANEL -->
+        <div class="panel" id="p-set">
+          <div class="pg-head" id="seth"><div><div class="pg-title">Settings</div><div class="pg-sub">Manage connected email accounts</div></div></div>
+          <div class="set-sec" id="ss0">
+            <div class="set-h"><div class="set-ht">Connected accounts</div><div class="sync-b" id="syncB">Sync now</div></div>
+            <div class="ac-r" id="a0"><div class="ac-i gg">G</div><div><div class="ac-n">James Mitchell</div><div class="ac-e">james@thegrandhotel.co.uk</div></div><div class="ac-s">Synced 2m ago</div></div>
+            <div class="ac-r" id="a1"><div class="ac-i gg">G</div><div><div class="ac-n">Sophie Turner</div><div class="ac-e">sophie@thegrandhotel.co.uk</div></div><div class="ac-s">Synced 2m ago</div></div>
+            <div class="ac-r" id="a2"><div class="ac-i ms">M</div><div><div class="ac-n">Oliver Chen</div><div class="ac-e">oliver@thegrandhotel.co.uk</div></div><div class="ac-s">Synced 3m ago</div></div>
+            <div class="ac-r" id="a3"><div class="ac-i gg">G</div><div><div class="ac-n">Emma Williams</div><div class="ac-e">emma@thegrandhotel.co.uk</div></div><div class="ac-s">Synced 2m ago</div></div>
+            <div class="ac-r" id="a4"><div class="ac-i ms">M</div><div><div class="ac-n">Daniel Okafor</div><div class="ac-e">daniel@thegrandhotel.co.uk</div></div><div class="ac-s">Synced 3m ago</div></div>
+            <div class="ac-r" id="a5"><div class="ac-i gg">G</div><div><div class="ac-n">Priya Sharma</div><div class="ac-e">priya@thegrandhotel.co.uk</div></div><div class="ac-s">Synced 2m ago</div></div>
+          </div>
+          <div class="set-sec" id="ss1">
+            <div class="set-h"><div class="set-ht">Recent sync activity</div></div>
+            <div class="sl-r" id="sl0"><div class="sl-d"></div><div class="sl-t">james@thegrandhotel.co.uk</div><div class="sl-c">47 msgs</div><div class="sl-tm">2m ago</div></div>
+            <div class="sl-r" id="sl1"><div class="sl-d"></div><div class="sl-t">sophie@thegrandhotel.co.uk</div><div class="sl-c">52 msgs</div><div class="sl-tm">2m ago</div></div>
+            <div class="sl-r" id="sl2"><div class="sl-d"></div><div class="sl-t">oliver@thegrandhotel.co.uk</div><div class="sl-c">41 msgs</div><div class="sl-tm">3m ago</div></div>
+            <div class="sl-r" id="sl3"><div class="sl-d"></div><div class="sl-t">emma@thegrandhotel.co.uk</div><div class="sl-c">38 msgs</div><div class="sl-tm">2m ago</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="cur"></div>
+  <div class="overlay" id="ov"></div>
+  <div class="feat-label" id="fl2"></div>
+</div>
+
+<!-- ═══ SCENE 5: BLACKOUT / BEAT SWITCH (24-25s) ═══ -->
+<div id="s5" class="scene"><div class="flash" id="fl" style="display:none"></div></div>
+
+<!-- ═══ SCENE 6: LOGO REVEAL (25-30s) ═══ -->
+<div id="s6" class="scene">
+  <div class="logo-reveal" id="lr">
+    <div class="lr-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+    <div class="lr-name">MailPulse</div>
+  </div>
+  <div class="lr-tag" id="lrt">See everything. Miss nothing.</div>
+</div>
+
+<!-- ═══ SCENE 7: DASHBOARD WALKTHROUGH (30-42s) — reuses scene 3 app frame ═══ -->
+
+<!-- ═══ SCENE 8: TRUST + DREAM (42-52s) ═══ -->
+<div id="s8" class="scene">
+  <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+    <div class="trust-icon" id="ti"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(37,99,235,0.7)" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+    <div class="trust-l1" id="tl1">Metadata only.</div>
+    <div class="trust-l2" id="tl2">We never read your emails.</div>
+  </div>
+  <div id="dreamWrap" style="display:none;flex-direction:column;align-items:flex-start;margin-top:24px">
+    <div class="dream-ln" id="d0"><div class="dream-bar" id="db0"></div>Track response times.</div>
+    <div class="dream-ln" id="d1"><div class="dream-bar" id="db1"></div>Spot bottlenecks.</div>
+    <div class="dream-ln" id="d2"><div class="dream-bar" id="db2"></div>Hold your team accountable.</div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 9: CTA (52-60s) ═══ -->
+<div id="s9" class="scene">
+  <div class="cta-glow"></div>
+  <div class="cta-logo" id="cl"><div class="cta-i"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="cta-n">MailPulse</div></div>
+  <div class="cta-tg" id="ct">Email analytics your team actually needs.</div>
+  <div class="cta-try" id="ctry">Try MailPulse today.</div>
+  <div class="cta-try-btn" id="ctb">Get Started Free</div>
+  <div class="cta-u" id="cu">jpautomations.co.uk</div>
+</div>
+
+<script>
+(function(){{
+  /* ── HELPERS ── */
+  function show(id){{ var e=document.getElementById(id); if(e){{ e.classList.remove('off'); e.classList.add('on'); }} }}
+  function hide(id){{ var e=document.getElementById(id); if(e){{ e.classList.remove('on'); e.classList.add('off'); }} }}
+  function add(id,c){{ var e=document.getElementById(id); if(e) e.classList.add(c); }}
+  function showPanel(id){{ document.querySelectorAll('.panel').forEach(function(p){{ p.classList.remove('on'); }}); var p=document.getElementById(id); if(p) p.classList.add('on'); }}
+  function setNav(idx){{ document.querySelectorAll('.sb-item').forEach(function(n,i){{ if(i===idx) n.classList.add('active'); else n.classList.remove('active'); }}); }}
+
+  function animN(el,tgt,dur,sfx,dec){{
+    var s=performance.now(); dec=dec||0;
+    function step(n){{ var t=Math.min((n-s)/dur,1); var e=1-Math.pow(1-t,3); var v=e*tgt; el.textContent=(dec?v.toFixed(dec):Math.round(v))+(sfx||''); if(t<1) requestAnimationFrame(step); }}
+    requestAnimationFrame(step);
+  }}
+
+  function ov(txt){{ var o=document.getElementById('ov'); o.textContent=txt; o.classList.add('in'); }}
+  function ovOff(){{ document.getElementById('ov').classList.remove('in'); }}
+
+  /* ── BUILD BAR CHART ── */
+  var bd=[[28,42],[32,48],[35,52],[22,35],[30,45],[38,55],[25,40]];
+  var dl=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var bc=document.getElementById('bars');
+  bd.forEach(function(d,i){{
+    var g=document.createElement('div'); g.className='bar-g';
+    var p=document.createElement('div'); p.className='bar-p';
+    var b1=document.createElement('div'); b1.className='bar b'; b1.style.height=(d[0]/55*100)+'%'; b1.id='bb'+i;
+    var b2=document.createElement('div'); b2.className='bar g'; b2.style.height=(d[1]/55*100)+'%'; b2.id='bg'+i;
+    p.appendChild(b1); p.appendChild(b2);
+    var l=document.createElement('div'); l.className='bar-d'; l.textContent=dl[i];
+    g.appendChild(p); g.appendChild(l); bc.appendChild(g);
+  }});
+
+  /* ── BUILD HEATMAP ── */
+  var hd=[0,0,0,0,0,0,1,2,3,4,4,3,2,3,4,4,3,2,1,1,0,0,0,0];
+  var hm=document.getElementById('hm');
+  hd.forEach(function(v,i){{
+    var c=document.createElement('div'); c.className='hm-c'; c.id='hc'+i;
+    if(v>0) c.setAttribute('data-h','h'+v);
+    hm.appendChild(c);
+  }});
+
+  /* ═══════════════════════════════════════════════════════
+     ORCHESTRATION — Narrative Flow
+     ────────────────────────────────────────────────────
+     PRE-SWITCH (0-25s, 123 BPM / 488ms beat):
+       Hook → Cost → Dashboard shows liabilities
+     BEAT SWITCH at 25s:
+       Blackout → MailPulse logo (the solution)
+     POST-SWITCH (28-44s, 96 BPM / 625ms beat):
+       Feature walkthrough: Overview → Staff → Unanswered → Settings
+     TRUST (44-52s):
+       "Metadata only. We never read your emails."
+     CTA (52-60s):
+       "Try MailPulse today."
+     ═══════════════════════════════════════════════════════ */
+  var B1=488, B2=625;
+
+  function featLabel(txt){{
+    var fl=document.getElementById('fl2');
+    fl.textContent=txt;
+    fl.classList.add('in');
+  }}
+  function featOff(){{
+    var fl=document.getElementById('fl2');
+    fl.classList.remove('in');
+  }}
+
+  /* ══ SCENE 1: HOOK (0-5s) ══ */
+  setTimeout(function(){{ add('hs','in'); }}, 200);
+  setTimeout(function(){{ add('hsl','in'); }}, 700);
+  for(var wi=0;wi<7;wi++){{
+    (function(i){{ setTimeout(function(){{ add('hw'+i,'in'); }}, 1500+(i*B1/2)); }})(wi);
+  }}
+
+  /* ══ SCENE 2: COST (5-10s) ══ */
+  setTimeout(function(){{
+    hide('s1'); show('s2');
+    setTimeout(function(){{ add('ch','in'); }}, 150);
+    setTimeout(function(){{ add('cc0','in'); }}, B1);
+    setTimeout(function(){{ add('cc1','in'); }}, B1*2);
+    setTimeout(function(){{ add('cc2','in'); }}, B1*3);
+  }}, 5000);
+
+  /* ══ SCENE 3: DASHBOARD — SHOWING THE PROBLEM (10-25s) ══ */
+  /* The dashboard builds up, then we zoom to unanswered to reveal where the liabilities hide */
+  setTimeout(function(){{
+    hide('s2'); show('s3');
+    add('af','in');
+    setTimeout(function(){{ add('sb','in'); }}, 200);
+    setTimeout(function(){{ add('dh','in'); }}, 400);
+
+    /* KPIs on beats */
+    setTimeout(function(){{ add('k0','in'); animN(document.getElementById('kv0'),92,800,'%'); }}, 600);
+    setTimeout(function(){{ add('k1','in'); animN(document.getElementById('kv1'),24,600,'m'); }}, 600+B1);
+    setTimeout(function(){{ add('k2','in'); animN(document.getElementById('kv2'),3,400,''); }}, 600+B1*2);
+    setTimeout(function(){{ add('k3','in'); animN(document.getElementById('kv3'),847,900,''); }}, 600+B1*3);
+
+    /* Charts */
+    setTimeout(function(){{
+      add('chBar','in');
+      bd.forEach(function(d,i){{ setTimeout(function(){{ add('bb'+i,'up'); setTimeout(function(){{ add('bg'+i,'up'); }},80); }}, i*120); }});
+    }}, 2400);
+
+    setTimeout(function(){{
+      add('chHeat','in');
+      hd.forEach(function(v,i){{ setTimeout(function(){{ var c=document.getElementById('hc'+i); c.classList.add('in'); var h=c.getAttribute('data-h'); if(h) c.classList.add(h); }}, i*35); }});
+    }}, 3400);
+
+    /* Staff table */
+    setTimeout(function(){{
+      add('stc','in');
+      for(var i=0;i<6;i++){{ (function(idx){{ setTimeout(function(){{ add('r'+idx,'in'); }}, idx*120); }})(i); }}
+      setTimeout(function(){{ add('r5','danger'); }}, 1000);
+    }}, 4500);
+
+    ov('Where are your liabilities hiding?');
+
+    /* 17s — Switch to unanswered to reveal the liabilities */
+    setTimeout(function(){{
+      ovOff();
+      setNav(2);
+      showPanel('p-ua');
+      setTimeout(function(){{ add('uah','in'); }}, 200);
+      setTimeout(function(){{ add('u0','in'); }}, 400);
+      setTimeout(function(){{ add('u1','in'); }}, 400+B1);
+      setTimeout(function(){{ add('u2','in'); }}, 400+B1*2);
+      setTimeout(function(){{ add('ub0','pulse'); }}, 1800);
+      setTimeout(function(){{ add('uaNotif','pop'); }}, 2200);
+      ov('These emails are costing you bookings.');
+    }}, 7000);
+
+  }}, 10000);
+
+  /* ══ SCENE 5: BLACKOUT — BEAT SWITCH (24-25s) ══ */
+  setTimeout(function(){{
+    ovOff();
+    hide('s3'); show('s5');
+  }}, 24000);
+
+  /* ══ SCENE 6: LOGO REVEAL — THE SOLUTION (25-28s) ══ */
+  setTimeout(function(){{
+    hide('s5'); show('s6');
+    document.getElementById('fl').style.display='block';
+    setTimeout(function(){{ add('lr','in'); }}, 200);
+    setTimeout(function(){{ add('lrt','in'); }}, 800);
+  }}, 25000);
+
+  /* ══ FEATURE WALKTHROUGH (28-44s) ══ */
+  /* Each feature page gets ~4 seconds with a label */
+
+  /* Feature 1: Dashboard Overview (28-32s) */
+  setTimeout(function(){{
+    hide('s6'); show('s3');
+
+    /* Reset all dashboard elements fresh */
+    add('af','in');
+    add('sb','in');
+    setNav(0); showPanel('p-dash');
+    add('dh','in');
+
+    /* Animate KPIs fresh */
+    ['k0','k1','k2','k3'].forEach(function(id,i){{
+      setTimeout(function(){{ add(id,'in'); }}, i*200);
+    }});
+    animN(document.getElementById('kv0'),92,900,'%');
+    animN(document.getElementById('kv1'),24,700,'m');
+    animN(document.getElementById('kv2'),3,400,'');
+    animN(document.getElementById('kv3'),847,1000,'');
+
+    /* Charts */
+    setTimeout(function(){{
+      add('chBar','in'); add('chHeat','in');
+      bd.forEach(function(d,i){{ setTimeout(function(){{ add('bb'+i,'up'); setTimeout(function(){{ add('bg'+i,'up'); }},80); }}, i*100); }});
+      hd.forEach(function(v,i){{ setTimeout(function(){{ var c=document.getElementById('hc'+i); c.classList.add('in'); var h=c.getAttribute('data-h'); if(h) c.classList.add(h); }}, i*30); }});
+    }}, 1000);
+
+    setTimeout(function(){{
+      add('stc','in');
+      for(var i=0;i<6;i++){{ (function(idx){{ setTimeout(function(){{ add('r'+idx,'in'); }}, idx*100); }})(i); }}
+    }}, 2000);
+
+    featLabel('DASHBOARD OVERVIEW');
+    ov('Every metric. Every team member. One view.');
+  }}, 28000);
+
+  /* Feature 2: Staff Performance (32-36s) */
+  setTimeout(function(){{
+    ovOff(); featOff();
+    setNav(1);
+    /* Stay on dashboard panel but highlight the staff table */
+    var cur=document.getElementById('cur');
+    cur.style.opacity='1';
+    cur.style.left='500px'; cur.style.top='550px';
+    setTimeout(function(){{ cur.style.left='135px'; cur.style.top='242px'; }}, 500);
+
+    setTimeout(function(){{
+      add('r5','danger');
+      featLabel('STAFF PERFORMANCE');
+      ov('Instantly see who needs support.');
+    }}, 800);
+  }}, 32000);
+
+  /* Feature 3: Unanswered Emails (36-40s) */
+  setTimeout(function(){{
+    ovOff(); featOff();
+    var cur=document.getElementById('cur');
+    cur.style.left='135px'; cur.style.top='282px';
+    setNav(2);
+    showPanel('p-ua');
+    add('uah','in');
+    setTimeout(function(){{ add('u0','in'); }}, 200);
+    setTimeout(function(){{ add('u1','in'); }}, 500);
+    setTimeout(function(){{ add('u2','in'); }}, 800);
+    setTimeout(function(){{ add('ub0','pulse'); }}, 1200);
+
+    featLabel('UNANSWERED ALERTS');
+    ov('Catch dropped emails before they cost you.');
+
+    setTimeout(function(){{ cur.style.opacity='0'; }}, 1500);
+  }}, 36000);
+
+  /* Feature 4: Settings & Integrations (40-44s) */
+  setTimeout(function(){{
+    ovOff(); featOff();
+    setNav(3);
+    showPanel('p-set');
+    setTimeout(function(){{ add('seth','in'); }}, 150);
+    setTimeout(function(){{
+      add('ss0','in');
+      for(var i=0;i<6;i++){{ (function(idx){{ setTimeout(function(){{ add('a'+idx,'in'); }}, idx*80); }})(i); }}
+    }}, 400);
+    setTimeout(function(){{
+      add('ss1','in');
+      for(var i=0;i<4;i++){{ (function(idx){{ setTimeout(function(){{ add('sl'+idx,'in'); }}, idx*120); }})(i); }}
+    }}, 1600);
+
+    featLabel('ONE-CLICK SETUP');
+    ov('Connect Google or Microsoft in seconds.');
+  }}, 40000);
+
+  /* ══ SCENE 8: TRUST + DREAM (44-52s) ══ */
+  setTimeout(function(){{
+    ovOff(); featOff();
+    hide('s3'); show('s8');
+    setTimeout(function(){{ add('ti','in'); }}, 300);
+    setTimeout(function(){{ add('tl1','in'); }}, 600);
+    setTimeout(function(){{ add('tl2','in'); }}, 1200);
+
+    /* Switch to dream lines */
+    setTimeout(function(){{
+      document.getElementById('ti').style.opacity='0';
+      document.getElementById('tl1').style.opacity='0';
+      document.getElementById('tl2').style.opacity='0';
+      var dw=document.getElementById('dreamWrap');
+      dw.style.display='flex';
+      setTimeout(function(){{ add('d0','in'); setTimeout(function(){{ add('db0','on'); }},150); }}, 300);
+      setTimeout(function(){{ add('d1','in'); setTimeout(function(){{ add('db1','on'); }},150); }}, 300+B2);
+      setTimeout(function(){{ add('d2','in'); setTimeout(function(){{ add('db2','on'); }},150); }}, 300+B2*2);
+    }}, 3500);
+  }}, 44000);
+
+  /* ══ SCENE 9: CTA (52-60s) ══ */
+  setTimeout(function(){{
+    hide('s8'); show('s9');
+    setTimeout(function(){{ add('cl','in'); }}, 300);
+    setTimeout(function(){{ add('ct','in'); }}, 1000);
+    setTimeout(function(){{ add('ctry','in'); }}, 1800);
+    setTimeout(function(){{ add('ctb','in'); }}, 2500);
+    setTimeout(function(){{ add('cu','in'); }}, 3500);
+  }}, 52000);
+
+}})();
+</script>
+</body>
+</html>

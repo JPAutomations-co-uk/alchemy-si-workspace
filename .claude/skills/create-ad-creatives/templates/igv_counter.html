@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{brand_name} — Counter</title>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --text-dark: {text_dark};
+    --bg: {bg_color};
+    --font-heading: '{heading_font}', 'Inter', sans-serif;
+    --font-body: '{body_font}', 'Inter', sans-serif;
+}}
+html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+body {{
+    background: var(--bg, #ffffff);
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    font-family: var(--font-body);
+}}
+
+/* Left accent bar */
+.accent-sidebar {{
+    width: 8px;
+    background: linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent) 60%, var(--primary)));
+    flex-shrink: 0;
+}}
+
+/* Giant faded watermark */
+.watermark {{
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 380px;
+    color: var(--primary);
+    opacity: 0.04;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    z-index: 0;
+}}
+
+/* Logo bottom-right */
+.logo-br {{
+    position: absolute;
+    bottom: 48px;
+    right: 52px;
+    z-index: 20;
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards 0.4s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}}
+
+.logo-br img {{
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+}}
+
+.logo-br .brand-label {{
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--primary);
+    opacity: 0.5;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}}
+
+/* Content area */
+.content {{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 72px;
+    position: relative;
+    z-index: 5;
+}}
+
+/* Counter number */
+.counter-number {{
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 140px;
+    color: var(--primary);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards 0.2s;
+}}
+
+/* Underline accent */
+.counter-underline {{
+    width: 56px;
+    height: 4px;
+    background: var(--accent);
+    margin-top: 16px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: scaleInX 0.7s cubic-bezier(0.22,1,0.36,1) forwards 3.2s;
+}}
+
+/* Stat label headline */
+.stat-label {{
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 30px;
+    color: var(--text-dark, #1a1a2e);
+    margin-top: 20px;
+    line-height: 1.2;
+    max-width: 380px;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 3.2s;
+}}
+
+/* Context subheadline */
+.stat-context {{
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--text-dark, #1a1a2e);
+    opacity: 0;
+    margin-top: 12px;
+    max-width: 360px;
+    line-height: 1.55;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 3.6s;
+}}
+
+/* CTA button */
+.cta-btn {{
+    display: inline-block;
+    margin-top: 28px;
+    padding: 14px 36px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    align-self: flex-start;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 4.0s;
+}}
+
+/* Keyframes */
+@keyframes fadeIn {{
+    from {{ opacity: 0; }}
+    to {{ opacity: 1; }}
+}}
+
+@keyframes fadeUp {{
+    from {{ opacity: 0; transform: translateY(24px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+}}
+
+@keyframes scaleInX {{
+    from {{ transform: scaleX(0); }}
+    to {{ transform: scaleX(1); }}
+}}
+</style>
+</head>
+<body>
+
+<div class="accent-sidebar"></div>
+
+<!-- Faded watermark -->
+<div class="watermark" aria-hidden="true">500</div>
+
+<!-- Logo bottom-right -->
+<div class="logo-br">
+    {logo_html}
+    <span class="brand-label">{brand_name}</span>
+</div>
+
+<!-- Content -->
+<div class="content">
+    <div class="counter-number" id="counter" data-target="500" data-suffix="%+">0%+</div>
+    <div class="counter-underline"></div>
+    <div class="stat-label">{headline}</div>
+    <div class="stat-context">{subheadline}</div>
+    <button class="cta-btn">{cta}</button>
+</div>
+
+<script>
+window.addEventListener('load', function() {{
+    var el = document.getElementById('counter');
+    var target = parseInt(el.dataset.target) || 500;
+    var suffix = el.dataset.suffix || '%+';
+    var duration = 3000;
+    var start = null;
+    function easeOut(t) {{ return 1 - Math.pow(1 - t, 3); }}
+    function step(timestamp) {{
+        if (!start) start = timestamp;
+        var progress = Math.min((timestamp - start) / duration, 1);
+        var value = Math.floor(easeOut(progress) * target);
+        el.textContent = value.toLocaleString() + suffix;
+        if (progress < 1) {{
+            requestAnimationFrame(step);
+        }}
+    }}
+    requestAnimationFrame(step);
+}});
+</script>
+</body>
+</html>

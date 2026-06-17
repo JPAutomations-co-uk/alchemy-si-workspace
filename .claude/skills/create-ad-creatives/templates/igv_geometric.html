@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{brand_name} — Geometric</title>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@700;800;900&family={body_font_encoded}:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --text-dark: {text_dark};
+    --bg: {bg_color};
+    --font-heading: '{heading_font}', 'Inter', sans-serif;
+    --font-body: '{body_font}', 'Inter', sans-serif;
+}}
+html, body {{ width: {width}px; height: {height}px; overflow: hidden; -webkit-font-smoothing: antialiased; }}
+
+*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+body {{
+    background: linear-gradient(160deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 85%, var(--secondary)) 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+}}
+
+/* SVG shapes layer */
+.shapes-layer {{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}}
+
+/* Large circle outline */
+.shape-circle-large {{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    height: 400px;
+    margin-top: -200px;
+    margin-left: -200px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    opacity: 0;
+    transform: scale(0);
+    animation: drawCircle 1.2s cubic-bezier(0.22,1,0.36,1) forwards 0.2s;
+}}
+
+/* Ring (large stroke circle) */
+.shape-ring {{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 520px;
+    height: 520px;
+    margin-top: -260px;
+    margin-left: -260px;
+    border-radius: 50%;
+    border: 40px solid var(--accent);
+    opacity: 0;
+    transform: scale(0);
+    animation: drawCircle 1.5s cubic-bezier(0.22,1,0.36,1) forwards 0.4s, slowPulse 4s ease-in-out infinite 2s;
+}}
+
+/* Small squares */
+.shape-sq {{
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    opacity: 0;
+}}
+
+.sq1 {{ top: 18%; left: 22%; transform: rotate(0deg); animation: rotateFade 0.7s ease forwards 0.8s; }}
+.sq2 {{ top: 72%; right: 18%; transform: rotate(45deg); animation: rotateFade 0.7s ease forwards 1.1s; }}
+.sq3 {{ bottom: 20%; left: 30%; transform: rotate(20deg); animation: rotateFade 0.7s ease forwards 1.4s; width: 10px; height: 10px; }}
+.sq4 {{ top: 25%; right: 25%; transform: rotate(-30deg); animation: rotateFade 0.7s ease forwards 1.6s; width: 12px; height: 12px; opacity: 0.7; }}
+
+/* Logo corner */
+.logo-corner {{
+    position: absolute;
+    top: 44px;
+    left: 50px;
+    z-index: 30;
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards 0.1s;
+}}
+
+.logo-corner img {{
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+}}
+
+/* Content on top */
+.content {{
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 0 60px;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}}
+
+.headline {{
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 58px;
+    color: var(--text-light);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards 2.0s;
+}}
+
+.accent-bar {{
+    width: 56px;
+    height: 4px;
+    background: var(--accent);
+    margin: 20px auto;
+    transform: scaleX(0);
+    transform-origin: center;
+    animation: scaleInX 0.6s cubic-bezier(0.22,1,0.36,1) forwards 2.7s;
+}}
+
+.subheadline {{
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 19px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.55;
+    max-width: 340px;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 3.0s;
+}}
+
+.cta-btn {{
+    display: inline-block;
+    margin-top: 26px;
+    padding: 14px 36px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) forwards 3.5s;
+}}
+
+/* SVG drawn lines */
+.svg-line-diag {{
+    position: absolute;
+    z-index: 2;
+}}
+
+/* Keyframes */
+@keyframes fadeIn {{
+    from {{ opacity: 0; }}
+    to {{ opacity: 1; }}
+}}
+
+@keyframes fadeUp {{
+    from {{ opacity: 0; transform: translateY(30px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+}}
+
+@keyframes scaleInX {{
+    from {{ transform: scaleX(0); }}
+    to {{ transform: scaleX(1); }}
+}}
+
+@keyframes drawCircle {{
+    from {{ opacity: 0; transform: scale(0) rotate(-90deg); }}
+    to {{ opacity: 0.25; transform: scale(1) rotate(0deg); }}
+}}
+
+@keyframes rotateFade {{
+    from {{ opacity: 0; transform: rotate(0deg) scale(0); }}
+    to {{ opacity: 0.7; transform: rotate(45deg) scale(1); }}
+}}
+
+@keyframes drawLine {{
+    from {{ stroke-dashoffset: 400; }}
+    to {{ stroke-dashoffset: 0; }}
+}}
+
+@keyframes slowPulse {{
+    0%, 100% {{ transform: scale(1); opacity: 0.12; }}
+    50% {{ transform: scale(1.03); opacity: 0.18; }}
+}}
+
+@keyframes slowRotate {{
+    from {{ transform: rotate(0deg); }}
+    to {{ transform: rotate(360deg); }}
+}}
+</style>
+</head>
+<body>
+
+<!-- Logo -->
+<div class="logo-corner">
+    {logo_html}
+</div>
+
+<!-- Background geometric shapes -->
+<div class="shapes-layer">
+    <!-- Large circle outline -->
+    <div class="shape-circle-large"></div>
+
+    <!-- Ring -->
+    <div class="shape-ring"></div>
+
+    <!-- SVG diagonal line -->
+    <svg class="svg-line-diag" style="top:10%; left:55%; width:200px; height:200px;" viewBox="0 0 200 200">
+        <line x1="0" y1="200" x2="200" y2="0"
+            stroke="var(--accent)" stroke-width="3" opacity="0.5"
+            stroke-dasharray="283" stroke-dashoffset="283"
+            style="animation: drawLine 1s cubic-bezier(0.22,1,0.36,1) 1.0s forwards;"/>
+    </svg>
+
+    <!-- SVG triangle -->
+    <svg class="svg-line-diag" style="bottom:8%; left:8%; width:180px; height:180px;" viewBox="0 0 180 180">
+        <polygon points="90,10 170,160 10,160"
+            fill="var(--accent)" opacity="0"
+            style="animation: rotateFade 1s ease 1.2s forwards;"/>
+    </svg>
+
+    <!-- Small squares -->
+    <div class="shape-sq sq1"></div>
+    <div class="shape-sq sq2"></div>
+    <div class="shape-sq sq3"></div>
+    <div class="shape-sq sq4"></div>
+</div>
+
+<!-- Content -->
+<div class="content">
+    <div class="headline">{headline}</div>
+    <div class="accent-bar"></div>
+    <div class="subheadline">{subheadline}</div>
+    <button class="cta-btn">{cta}</button>
+</div>
+
+</body>
+</html>

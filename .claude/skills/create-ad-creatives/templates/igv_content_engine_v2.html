@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@400;500;600;700;800;900&family={body_font_encoded}:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   IG ENGINE V2 — 47s Beat-Synced YouTube Ad (4K)
+   JP Automations Design System
+   94 BPM / 638ms beat / 2553ms bar
+   rem-scaled: 1rem = 10px @1920 = 20px @3840
+   ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --font-heading: '{heading_font}', 'Inter', system-ui, sans-serif;
+    --font-body: '{body_font}', 'Inter', system-ui, sans-serif;
+    --font-mono: 'Space Mono', 'SF Mono', monospace;
+    --beat: 638ms;
+    --snap: cubic-bezier(0.2, 0.0, 0, 1.0);
+    --reveal: cubic-bezier(0.16, 1, 0.3, 1);
+    --lux: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --teal: #2DD4BF;
+    --teal-dim: rgba(45,212,191,0.06);
+    --teal-glow: rgba(45,212,191,0.25);
+    --card-bg: rgba(255,255,255,0.03);
+    --card-border: rgba(255,255,255,0.08);
+    --card-active: rgba(45,212,191,0.18);
+    --card-r: 1.6rem;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+}}
+
+html {{
+    width: {width}px; height: {height}px;
+    font-size: calc(10px * {width} / 1920);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}}
+body {{
+    width: 100%; height: 100%;
+    background: #000; color: #fff;
+    font-family: var(--font-body);
+}}
+
+/* ── BACKGROUND LAYERS ── */
+canvas#mesh {{ position: fixed; inset: 0; z-index: 0; }}
+
+.grid-overlay {{
+    position: fixed; inset: 0; z-index: 1;
+    background-image:
+        linear-gradient(to right, rgba(128,128,128,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(128,128,128,0.05) 1px, transparent 1px);
+    background-size: 6.4rem 6.4rem;
+    mask-image: radial-gradient(ellipse 75% 65% at 50% 50%, black 25%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 50%, black 25%, transparent 100%);
+    pointer-events: none; opacity: 0;
+    transition: opacity 3s var(--lux);
+}}
+
+.noise-overlay {{
+    position: fixed; inset: 0; z-index: 2; opacity: 0.03; pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}}
+
+.vignette-overlay {{
+    position: fixed; inset: 0; z-index: 3;
+    background: radial-gradient(ellipse 75% 65% at 50% 50%, transparent 35%, rgba(0,0,0,0.55) 100%);
+    pointer-events: none;
+}}
+
+/* ── SCENES ── */
+.scene {{
+    position: absolute; inset: 0; z-index: 10;
+    opacity: 0; pointer-events: none;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 900ms var(--reveal);
+}}
+.scene.active {{ opacity: 1; pointer-events: auto; }}
+.scene.fading {{ opacity: 0; transition: opacity 600ms ease; }}
+
+/* ── KEYFRAMES ── */
+@keyframes luxReveal {{
+    from {{ opacity: 0; filter: blur(0.4rem); transform: translateY(0.8rem) scale(0.97); }}
+    to   {{ opacity: 1; filter: blur(0);      transform: translateY(0) scale(1); }}
+}}
+@keyframes gentleFade {{
+    from {{ opacity: 0; }}
+    to   {{ opacity: 1; }}
+}}
+@keyframes driftSlow {{
+    0%, 100% {{ transform: translate(0, 0) rotate(0deg); }}
+    25%      {{ transform: translate(0.8rem, -1rem) rotate(0.8deg); }}
+    50%      {{ transform: translate(-0.5rem, 0.7rem) rotate(-0.4deg); }}
+    75%      {{ transform: translate(1rem, 0.5rem) rotate(0.6deg); }}
+}}
+@keyframes scatterOut {{
+    to {{ opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0.6) rotate(var(--sr)); }}
+}}
+@keyframes pulseTeal {{
+    0%, 100% {{ text-shadow: 0 0 0 rgba(45,212,191,0); }}
+    50%      {{ text-shadow: 0 0 2rem rgba(45,212,191,0.35); }}
+}}
+@keyframes ctaBounce {{
+    0%   {{ opacity: 0; transform: scale(0.95); }}
+    65%  {{ opacity: 1; transform: scale(0.99); }}
+    82%  {{ transform: scale(1.02); }}
+    100% {{ transform: scale(1); }}
+}}
+@keyframes radiateGlow {{
+    0%   {{ box-shadow: 0 0 0 0 rgba(45,212,191,0.3); }}
+    100% {{ box-shadow: 0 0 6rem 3rem rgba(45,212,191,0); }}
+}}
+@keyframes cursorBlink {{
+    0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0; }}
+}}
+@keyframes shake {{
+    0%, 100% {{ transform: translate(0, 0); }}
+    20% {{ transform: translate(-0.2rem, 0.1rem); }}
+    40% {{ transform: translate(0.15rem, -0.15rem); }}
+    60% {{ transform: translate(-0.1rem, 0.2rem); }}
+    80% {{ transform: translate(0.2rem, -0.1rem); }}
+}}
+@keyframes phoneGrad {{
+    0%   {{ background-position: 0% 0%; }}
+    50%  {{ background-position: 100% 100%; }}
+    100% {{ background-position: 0% 0%; }}
+}}
+@keyframes borderPulse {{
+    0%, 100% {{ border-color: var(--card-border); }}
+    50%      {{ border-color: rgba(45,212,191,0.12); }}
+}}
+.shaking {{ animation: shake 350ms ease; }}
+
+/* ═══ SCENE 1: THE STRUGGLE ═══ */
+#scene1 {{ padding: 0; }}
+#scene1 .task-card {{
+    position: absolute;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-r);
+    padding: 1.4rem 2.4rem;
+    display: flex; align-items: center; gap: 1.2rem;
+    opacity: 0;
+    will-change: transform, opacity;
+    backdrop-filter: blur(1.6rem);
+    -webkit-backdrop-filter: blur(1.6rem);
+}}
+#scene1 .marker {{
+    font-family: var(--font-mono); font-size: 1.2rem; color: var(--teal);
+}}
+#scene1 .task-name {{
+    font-family: var(--font-body); font-weight: 400; font-size: 1.5rem;
+    color: var(--gray-300); white-space: nowrap;
+}}
+#scene1 .struggle-heading {{
+    position: absolute; z-index: 5;
+    font-family: var(--font-heading); font-weight: 800;
+    font-size: 5.4rem; color: #fff; line-height: 1.08;
+    letter-spacing: -0.03em; text-align: center;
+    max-width: 76rem; opacity: 0;
+    filter: blur(0.6rem); transform: translateY(1rem);
+    will-change: transform, opacity, filter;
+}}
+
+/* ═══ SCENE 2: THE SNAP ═══ */
+#scene2 {{ padding: 6rem 10rem; gap: 4rem; }}
+#scene2 .snap-grid {{
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.8rem; width: 100%; max-width: 84rem;
+}}
+#scene2 .snap-cell {{
+    background: var(--card-bg);
+    backdrop-filter: blur(1.6rem); -webkit-backdrop-filter: blur(1.6rem);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-r);
+    padding: 2.4rem 2.2rem;
+    display: flex; align-items: center; gap: 1.4rem;
+    opacity: 0; transform: scale(0.95);
+    position: relative; overflow: hidden;
+    will-change: transform, opacity;
+    transition: border-color 800ms var(--lux), box-shadow 800ms var(--lux);
+}}
+#scene2 .snap-cell::before {{
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 100%, rgba(45,212,191,0.07) 0%, transparent 65%);
+    opacity: 0; transition: opacity 800ms var(--lux);
+    pointer-events: none; border-radius: var(--card-r);
+}}
+#scene2 .snap-cell.glow::before {{ opacity: 1; }}
+#scene2 .snap-cell.glow {{
+    border-color: rgba(45,212,191,0.18);
+    box-shadow: 0 0.4rem 2.4rem rgba(45,212,191,0.06);
+}}
+#scene2 .cell-marker {{
+    font-family: var(--font-mono); font-size: 1.2rem; color: var(--teal);
+}}
+#scene2 .cell-label {{
+    font-family: var(--font-body); font-weight: 500; font-size: 1.6rem; color: var(--gray-300);
+}}
+#scene2 .snap-heading {{
+    font-family: var(--font-heading); font-weight: 800;
+    font-size: 5.6rem; line-height: 1.08; letter-spacing: -0.03em;
+    text-align: center; color: #fff;
+}}
+#scene2 .snap-heading .word {{
+    display: inline-block; opacity: 0;
+    filter: blur(0.4rem); transform: translateY(0.6rem);
+    margin: 0 0.5rem;
+    will-change: transform, opacity, filter;
+}}
+
+/* ═══ SCENE 3: THE ENGINE ═══ */
+#scene3 {{
+    flex-direction: row; gap: 5.6rem; padding: 6rem 10rem;
+}}
+#scene3 .engine-main {{
+    flex: 0 0 auto; display: flex; flex-direction: column;
+    align-items: center; gap: 1.6rem;
+}}
+#scene3 .app-card {{
+    background: var(--card-bg);
+    backdrop-filter: blur(1.6rem); -webkit-backdrop-filter: blur(1.6rem);
+    border: 1px solid var(--card-border);
+    border-radius: 2.4rem; padding: 5rem 6.4rem;
+    text-align: center; opacity: 0; transform: scale(0.97);
+    position: relative; overflow: hidden;
+    will-change: transform, opacity;
+    transition: box-shadow 1s var(--lux), border-color 1s var(--lux);
+}}
+#scene3 .app-card::before {{
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 100%, rgba(45,212,191,0.08) 0%, transparent 65%);
+    pointer-events: none; border-radius: 2.4rem;
+}}
+#scene3 .app-eyebrow {{
+    font-family: var(--font-mono); font-size: 1.1rem; font-weight: 400;
+    color: var(--teal); text-transform: uppercase;
+    letter-spacing: 0.25em; margin-bottom: 1.6rem;
+}}
+#scene3 .app-title {{
+    font-family: var(--font-mono); font-size: 4.2rem; font-weight: 700;
+    color: var(--teal); letter-spacing: 0.04em; line-height: 1.2;
+}}
+#scene3 .app-title .cursor {{
+    display: inline-block; width: 0.3rem; height: 4.2rem;
+    background: var(--teal); margin-left: 0.4rem;
+    vertical-align: middle;
+    animation: cursorBlink 750ms step-end infinite;
+}}
+#scene3 .app-subtitle {{
+    font-family: var(--font-body); font-weight: 400; font-size: 1.4rem;
+    color: var(--gray-400); margin-top: 0.8rem; letter-spacing: 0.04em;
+}}
+#scene3 .feature-grid {{
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 1.4rem; max-width: 56rem;
+}}
+#scene3 .feature-card {{
+    background: var(--card-bg);
+    backdrop-filter: blur(1.6rem); -webkit-backdrop-filter: blur(1.6rem);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-r);
+    padding: 2rem 2.2rem;
+    display: flex; align-items: center; gap: 1.4rem;
+    opacity: 0; transform: scale(0.97);
+    position: relative; overflow: hidden;
+    will-change: transform, opacity;
+    transition: border-color 800ms var(--lux), box-shadow 800ms var(--lux);
+}}
+#scene3 .feature-card::before {{
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 100%, rgba(45,212,191,0.06) 0%, transparent 65%);
+    opacity: 0; transition: opacity 600ms var(--lux);
+    pointer-events: none; border-radius: var(--card-r);
+}}
+#scene3 .feature-card.lit::before {{ opacity: 1; }}
+#scene3 .feature-card.lit {{
+    border-color: rgba(45,212,191,0.18);
+    box-shadow: 0 0.4rem 2rem rgba(45,212,191,0.05);
+}}
+#scene3 .f-marker {{
+    font-family: var(--font-mono); font-size: 1.2rem; color: var(--teal); flex-shrink: 0;
+}}
+#scene3 .f-name {{
+    font-family: var(--font-body); font-weight: 600; font-size: 1.5rem; color: #fff;
+}}
+#scene3 .f-tokens {{
+    font-family: var(--font-mono); font-size: 1.1rem;
+    color: var(--gray-500); margin-left: auto; white-space: nowrap;
+}}
+
+/* ═══ SCENE 4: DREAM STATES ═══ */
+#scene4 {{ padding: 6rem 10rem; }}
+.vig {{
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 6rem 10rem; opacity: 0;
+    transition: opacity 700ms var(--lux);
+}}
+.vig-a .stat-number {{
+    font-family: var(--font-mono); font-weight: 700;
+    font-size: 15rem; color: var(--teal);
+    line-height: 1; letter-spacing: -0.04em;
+    margin-bottom: 0.4rem;
+    animation: pulseTeal 2.5s ease infinite;
+}}
+.vig-a .stat-unit {{
+    font-family: var(--font-mono); font-size: 1.3rem;
+    color: var(--gray-400); text-transform: uppercase;
+    letter-spacing: 0.25em; margin-bottom: 3rem;
+}}
+.vig-a .calendar-grid {{
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem; width: 36rem; margin-bottom: 3.2rem;
+}}
+.vig-a .cal-cell {{
+    width: 100%; aspect-ratio: 1;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 0.4rem; opacity: 0; transform: scale(0.85);
+    will-change: transform, opacity;
+}}
+.vig-a .cal-cell.filled {{
+    background: var(--teal-dim);
+    border-color: rgba(45,212,191,0.2);
+}}
+.vig-text {{
+    font-family: var(--font-heading); font-weight: 800;
+    font-size: 3.6rem; text-align: center; color: #fff;
+    letter-spacing: -0.02em; max-width: 70rem; line-height: 1.2;
+    opacity: 0; filter: blur(0.4rem); transform: translateY(0.6rem);
+    will-change: transform, opacity, filter;
+}}
+.vig-b {{ flex-direction: row; gap: 7.2rem; }}
+.vig-b .phone-frame {{
+    width: 18rem; height: 36rem;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 2.4rem; overflow: hidden;
+    position: relative; flex-shrink: 0;
+    opacity: 0; transform: scale(0.97);
+    will-change: transform, opacity;
+}}
+.vig-b .phone-screen {{
+    position: absolute; inset: 0.5rem; border-radius: 1.9rem; overflow: hidden;
+    background: linear-gradient(135deg, var(--teal), rgba(45,212,191,0.15), #0a0a0a);
+    background-size: 300% 300%;
+    animation: phoneGrad 4s ease infinite;
+}}
+.vig-b .phone-screen::after {{
+    content: '\25B6'; position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 2.8rem; color: rgba(255,255,255,0.4);
+}}
+.vig-b .text-side {{
+    display: flex; flex-direction: column; justify-content: center;
+    max-width: 50rem;
+}}
+.vig-b .eyebrow-text {{
+    font-family: var(--font-mono); font-size: 1.1rem;
+    color: var(--teal); text-transform: uppercase;
+    letter-spacing: 0.25em; margin-bottom: 1.6rem; opacity: 0;
+}}
+.vig-b .vig-heading {{
+    font-family: var(--font-heading); font-weight: 800;
+    font-size: 4.2rem; color: #fff; letter-spacing: -0.03em;
+    line-height: 1.12; opacity: 0;
+    filter: blur(0.4rem); transform: translateY(0.6rem);
+    will-change: transform, opacity, filter;
+}}
+.vig-c .progress-pct {{
+    font-family: var(--font-mono); font-weight: 700;
+    font-size: 10rem; color: var(--teal);
+    letter-spacing: -0.04em; margin-bottom: 2rem; opacity: 0;
+    animation: pulseTeal 2.5s ease infinite;
+}}
+.vig-c .progress-track {{
+    width: 46rem; height: 0.4rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 0.2rem; overflow: hidden;
+    margin-bottom: 3.2rem; opacity: 0;
+}}
+.vig-c .progress-fill {{
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), rgba(45,212,191,0.4));
+    border-radius: 0.2rem; width: 0%;
+}}
+
+/* ═══ SCENE 5: CTA ═══ */
+#scene5 {{ gap: 2rem; }}
+#scene5 .logo-container {{
+    opacity: 0; transform: scale(0.97); margin-bottom: 0.4rem;
+    will-change: transform, opacity;
+}}
+#scene5 .logo-container img {{
+    height: 5.2rem; width: auto; object-fit: contain;
+}}
+#scene5 .cta-eyebrow {{
+    font-family: var(--font-mono); font-size: 1.1rem;
+    color: var(--teal); text-transform: uppercase;
+    letter-spacing: 0.25em; opacity: 0;
+}}
+#scene5 .cta-brand {{
+    font-family: var(--font-mono); font-size: 5.6rem; font-weight: 700;
+    letter-spacing: 0.04em; opacity: 0; transform: scale(0.97);
+    background: linear-gradient(to right, #2DD4BF, #99F6E4);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    will-change: transform, opacity;
+}}
+#scene5 .cta-headline {{
+    font-family: var(--font-heading); font-weight: 800;
+    font-size: 5rem; color: #fff; letter-spacing: -0.03em;
+    opacity: 0; transform: scale(0.97);
+    will-change: transform, opacity;
+}}
+#scene5 .cta-sub {{
+    font-family: var(--font-body); font-weight: 400;
+    font-size: 1.8rem; color: var(--gray-400);
+    max-width: 50rem; text-align: center; opacity: 0;
+}}
+#scene5 .cta-pill {{
+    display: inline-flex; align-items: center; gap: 1rem;
+    padding: 1.8rem 5rem; margin-top: 0.8rem;
+    background: var(--teal); color: #000;
+    font-family: var(--font-body); font-weight: 700;
+    font-size: 1.6rem; letter-spacing: 0.06em;
+    text-transform: uppercase; border-radius: 10rem;
+    opacity: 0; transform: scale(0.97);
+    box-shadow: 0 0.4rem 2.4rem rgba(45,212,191,0.12);
+    will-change: transform, opacity;
+}}
+#scene5 .cta-url {{
+    font-family: var(--font-mono); font-weight: 400;
+    font-size: 1.3rem; color: var(--gray-500);
+    letter-spacing: 0.06em; opacity: 0;
+}}
+</style>
+</head>
+<body>
+
+<canvas id="mesh"></canvas>
+<div class="grid-overlay" id="gridO"></div>
+<div class="noise-overlay"></div>
+<div class="vignette-overlay"></div>
+
+<!-- ═══ SCENE 1 ═══ -->
+<div id="scene1" class="scene">
+    <div class="task-card" id="t0" style="top:18%;left:6%"><span class="marker">[+]</span><span class="task-name">Write Caption</span></div>
+    <div class="task-card" id="t1" style="top:12%;left:52%"><span class="marker">[+]</span><span class="task-name">Film Reel</span></div>
+    <div class="task-card" id="t2" style="top:44%;left:3%"><span class="marker">[+]</span><span class="task-name">Design Carousel</span></div>
+    <div class="task-card" id="t3" style="top:38%;left:68%"><span class="marker">[+]</span><span class="task-name">Schedule Post</span></div>
+    <div class="task-card" id="t4" style="top:72%;left:10%"><span class="marker">[+]</span><span class="task-name">Research Hashtags</span></div>
+    <div class="task-card" id="t5" style="top:65%;left:62%"><span class="marker">[+]</span><span class="task-name">Edit Photos</span></div>
+    <div class="task-card" id="t6" style="top:28%;left:32%"><span class="marker">[+]</span><span class="task-name">Plan Content</span></div>
+    <div class="task-card" id="t7" style="top:78%;left:40%"><span class="marker">[+]</span><span class="task-name">Analyze Metrics</span></div>
+    <div class="struggle-heading" id="sH">Creating content<br>shouldn't feel like this.</div>
+</div>
+
+<!-- ═══ SCENE 2 ═══ -->
+<div id="scene2" class="scene">
+    <div class="snap-grid" id="sG">
+        <div class="snap-cell"><span class="cell-marker">[+]</span><span class="cell-label">Reels</span></div>
+        <div class="snap-cell"><span class="cell-marker">[+]</span><span class="cell-label">Carousels</span></div>
+        <div class="snap-cell"><span class="cell-marker">[+]</span><span class="cell-label">Images</span></div>
+        <div class="snap-cell"><span class="cell-marker">[+]</span><span class="cell-label">Captions</span></div>
+        <div class="snap-cell"><span class="cell-marker">[+]</span><span class="cell-label">Content Plans</span></div>
+        <div class="snap-cell"><span class="cell-marker">[+]</span><span class="cell-label">Ad Creatives</span></div>
+    </div>
+    <div class="snap-heading" id="sHd">
+        <span class="word">What</span>
+        <span class="word">if</span>
+        <span class="word">it</span>
+        <span class="word">created</span>
+        <span class="word">itself?</span>
+    </div>
+</div>
+
+<!-- ═══ SCENE 3 ═══ -->
+<div id="scene3" class="scene">
+    <div class="engine-main">
+        <div class="app-card" id="aC">
+            <div class="app-eyebrow">CONTENT ENGINE</div>
+            <div class="app-title"><span id="twT"></span><span class="cursor"></span></div>
+            <div class="app-subtitle">by JPAutomations</div>
+        </div>
+    </div>
+    <div class="feature-grid" id="fG">
+        <div class="feature-card"><span class="f-marker">[+]</span><span class="f-name">AI Reels</span><span class="f-tokens">15 tokens</span></div>
+        <div class="feature-card"><span class="f-marker">[+]</span><span class="f-name">Carousel Posts</span><span class="f-tokens">10 tokens</span></div>
+        <div class="feature-card"><span class="f-marker">[+]</span><span class="f-name">Single Images</span><span class="f-tokens">5 tokens</span></div>
+        <div class="feature-card"><span class="f-marker">[+]</span><span class="f-name">AI Captions</span><span class="f-tokens">1 token</span></div>
+        <div class="feature-card"><span class="f-marker">[+]</span><span class="f-name">Content Plans</span><span class="f-tokens">25 tokens</span></div>
+        <div class="feature-card"><span class="f-marker">[+]</span><span class="f-name">Ad Creatives</span><span class="f-tokens">10 tokens</span></div>
+    </div>
+</div>
+
+<!-- ═══ SCENE 4 ═══ -->
+<div id="scene4" class="scene">
+    <div class="vig vig-a" id="vA">
+        <div class="stat-number" id="cE">0</div>
+        <div class="stat-unit">days of content</div>
+        <div class="calendar-grid" id="cG"></div>
+        <div class="vig-text" id="vTA">A month of content. Minutes to make.</div>
+    </div>
+    <div class="vig vig-b" id="vB">
+        <div class="phone-frame" id="pF"><div class="phone-screen"></div></div>
+        <div class="text-side">
+            <div class="eyebrow-text" id="vBE">SCROLL-STOPPING</div>
+            <div class="vig-heading" id="vBH">Every reel.<br>Every carousel.<br>On brand.</div>
+        </div>
+    </div>
+    <div class="vig vig-c" id="vC">
+        <div class="progress-pct" id="pE">0%</div>
+        <div class="progress-track" id="pT"><div class="progress-fill" id="pFl"></div></div>
+        <div class="vig-text" id="vTC">You describe it. We generate it.</div>
+    </div>
+</div>
+
+<!-- ═══ SCENE 5 ═══ -->
+<div id="scene5" class="scene">
+    <div class="logo-container" id="cL">{logo_html}</div>
+    <div class="cta-eyebrow" id="cE5">CONTENT ENGINE</div>
+    <div class="cta-brand" id="cB">IG ENGINE</div>
+    <div class="cta-headline" id="cH">{headline}</div>
+    <div class="cta-sub" id="cS">{subheadline}</div>
+    <div class="cta-pill" id="cP">{cta}</div>
+    <div class="cta-url" id="cU">jpautomations.co.uk</div>
+</div>
+
+<script>
+(function() {{
+    var BEAT = 638, BAR = 2553, W = {width}, H = {height};
+
+    /* ── CANVAS (match actual pixel size) ── */
+    var cvs = document.getElementById('mesh');
+    cvs.width = W; cvs.height = H;
+    var ctx = cvs.getContext('2d');
+    var mPh=0, mI=0, mW=0, mTI=0, mTW=0;
+
+    function drawMesh(t) {{
+        mPh = t * 0.00025;
+        mI += (mTI - mI) * 0.015;
+        mW += (mTW - mW) * 0.015;
+        ctx.clearRect(0,0,W,H);
+        var a = 0.03 + mI * 0.18;
+
+        /* 4 orbs for rich, layered depth */
+        var orbs = [
+            [0.38, 0.32, 0.55, 0.8,  1.0],
+            [0.72, 0.68, 0.40, 1.1,  0.35],
+            [0.85, 0.18, 0.30, 1.4,  0.2],
+            [0.15, 0.75, 0.35, 0.6,  0.25]
+        ];
+        orbs.forEach(function(o) {{
+            var cx = W*o[0] + Math.sin(mPh*o[3])*W*0.1;
+            var cy = H*o[1] + Math.cos(mPh*o[3]*0.7)*H*0.08;
+            var r = Math.max(W,H)*o[2];
+            var g = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+            var oa = a * o[4];
+            g.addColorStop(0, 'rgba(45,212,191,'+oa+')');
+            g.addColorStop(0.25,'rgba(35,180,165,'+(oa*0.7)+')');
+            g.addColorStop(0.5, 'rgba(20,100,90,'+(oa*0.35)+')');
+            if(mW>0.01 && o[4]>0.5) g.addColorStop(0.6,'rgba(160,50,35,'+(mW*0.06)+')');
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+        }});
+        requestAnimationFrame(drawMesh);
+    }}
+    requestAnimationFrame(drawMesh);
+
+    /* ── BEAT PULSE (subtle) ── */
+    var bpT=[], bpA=false, bpI=null;
+    function startBP() {{
+        if(bpA) return; bpA=true;
+        bpI=setInterval(function(){{
+            bpT.forEach(function(e){{
+                e.style.transition='transform 250ms var(--lux)';
+                e.style.transform='scale(1.006)';
+                setTimeout(function(){{ e.style.transform='scale(1)'; }},250);
+            }});
+        }}, BEAT);
+    }}
+    function stopBP() {{ bpA=false; if(bpI) clearInterval(bpI); bpT=[]; }}
+
+    /* ── SCENE MANAGER (crossfade) ── */
+    var currentScene = null;
+    function crossfade(toId) {{
+        var to = document.getElementById(toId);
+        if(currentScene) {{
+            currentScene.classList.add('fading');
+            currentScene.classList.remove('active');
+            var old = currentScene;
+            setTimeout(function(){{ old.classList.remove('fading'); }}, 700);
+        }}
+        if(to) {{
+            to.style.opacity = '0';
+            to.classList.add('active');
+            requestAnimationFrame(function(){{
+                requestAnimationFrame(function(){{
+                    to.style.opacity = '';
+                }});
+            }});
+        }}
+        currentScene = to;
+    }}
+
+    /* ── LUXURY REVEAL ── */
+    function lux(el, delay, dur) {{
+        dur = dur || 1200;
+        setTimeout(function(){{
+            el.style.transition = 'opacity '+dur+'ms var(--reveal), transform '+dur+'ms var(--reveal), filter '+dur+'ms var(--reveal)';
+            el.style.opacity='1'; el.style.transform='scale(1) translateY(0)'; el.style.filter='blur(0)';
+        }}, delay);
+    }}
+
+    /* ── TYPEWRITER ── */
+    function tw(el, text, spd, cb) {{
+        var i=0, iv=setInterval(function(){{
+            if(i<text.length){{ el.textContent+=text[i]; i++; }}
+            else {{ clearInterval(iv); if(cb) cb(); }}
+        }}, spd);
+    }}
+
+    /* ── COUNTER ── */
+    function animN(el, tgt, dur, sfx) {{
+        var s=performance.now();
+        function step(n) {{
+            var t=Math.min((n-s)/dur,1);
+            var e=1-Math.pow(1-t,3);
+            el.textContent=Math.round(e*tgt)+(sfx||'');
+            if(t<1) requestAnimationFrame(step);
+        }}
+        requestAnimationFrame(step);
+    }}
+
+    /* ── PHYSICS ── */
+    function physics(cards, px) {{
+        cards.forEach(function(c,i){{
+            var a=(i/cards.length)*Math.PI*2;
+            var dx=Math.cos(a)*px, dy=Math.sin(a)*px;
+            c.style.transition='transform 400ms var(--lux)';
+            c.style.transform='scale(1) translate('+dx+'px,'+dy+'px)';
+            setTimeout(function(){{ c.style.transform='scale(1)'; }}, 400);
+        }});
+    }}
+
+    /* ── BUILD CALENDAR ── */
+    var cg=document.getElementById('cG');
+    for(var ci=0;ci<28;ci++) {{
+        var cel=document.createElement('div');
+        cel.className='cal-cell'; cg.appendChild(cel);
+    }}
+
+    var grid=document.getElementById('gridO');
+
+    /* ═══════════════════════════════════════════════════════
+       SCENE ORCHESTRATION — 94 BPM
+       ═══════════════════════════════════════════════════════ */
+
+    /* ── SCENE 1: STRUGGLE (0–17.2s) ── */
+    crossfade('scene1');
+    var tc=document.querySelectorAll('#scene1 .task-card');
+    var sH=document.getElementById('sH');
+    mTI=0.1;
+
+    setTimeout(function(){{ grid.style.opacity='0.5'; }}, 800);
+
+    tc.forEach(function(c,i){{
+        setTimeout(function(){{
+            c.style.transition='opacity 1500ms var(--lux)';
+            c.style.opacity='1';
+            c.style.animation='driftSlow '+(6+i*0.7)+'s ease-in-out infinite';
+        }}, 2553+(i*450));
+    }});
+
+    setTimeout(function(){{
+        sH.style.transition='opacity 1200ms var(--reveal), filter 1200ms var(--reveal), transform 1200ms var(--reveal)';
+        sH.style.opacity='1'; sH.style.filter='blur(0)'; sH.style.transform='translateY(0)';
+    }}, 7660);
+
+    setTimeout(function(){{
+        mTI=0.25;
+        tc.forEach(function(c){{ c.style.animationDuration='3s'; }});
+    }}, 10213);
+
+    setTimeout(function(){{ mTW=0.4; }}, 12766);
+
+    setTimeout(function(){{
+        var dirs=[[-350,-300,-20],[400,-280,18],[-300,350,-15],[380,280,20],
+                  [-200,-400,12],[300,-350,-18],[-250,400,15],[280,380,-20]];
+        tc.forEach(function(c,i){{
+            var d=dirs[i%dirs.length];
+            c.style.setProperty('--sx',d[0]+'px');
+            c.style.setProperty('--sy',d[1]+'px');
+            c.style.setProperty('--sr',d[2]+'deg');
+            c.style.animation='scatterOut 700ms var(--lux) forwards';
+        }});
+        document.getElementById('scene1').classList.add('shaking');
+    }}, 14681);
+
+    setTimeout(function(){{
+        sH.style.transition='opacity 600ms ease';
+        sH.style.opacity='0'; mTW=0; mTI=0.03;
+    }}, 15957);
+
+    /* ── SCENE 2: SNAP (17.234s) ── */
+    setTimeout(function(){{
+        crossfade('scene2'); mTI=0.7; mTW=0;
+        grid.style.opacity='1';
+        var cells=document.querySelectorAll('#scene2 .snap-cell');
+
+        cells.forEach(function(c,i){{
+            setTimeout(function(){{
+                c.style.transition='opacity 600ms var(--snap), transform 600ms var(--snap)';
+                c.style.opacity='1'; c.style.transform='scale(1)';
+                setTimeout(function(){{ c.classList.add('glow'); }}, 400);
+            }}, i*120);
+        }});
+
+        var words=document.querySelectorAll('#scene2 .snap-heading .word');
+        words.forEach(function(w,i){{
+            setTimeout(function(){{
+                w.style.transition='opacity 800ms var(--reveal), filter 800ms var(--reveal), transform 800ms var(--reveal)';
+                w.style.opacity='1'; w.style.filter='blur(0)'; w.style.transform='translateY(0)';
+            }}, 1600+(i*480));
+        }});
+
+        setTimeout(function(){{ bpT=Array.from(cells); startBP(); }}, 1400);
+    }}, 17234);
+
+    /* ── SCENE 3: ENGINE (22.340s) ── */
+    setTimeout(function(){{
+        stopBP(); crossfade('scene3');
+        grid.style.opacity='0.7';
+        var ac=document.getElementById('aC');
+        var fc=document.querySelectorAll('#scene3 .feature-card');
+
+        lux(ac, 1277, 1200);
+
+        setTimeout(function(){{
+            tw(document.getElementById('twT'), 'IG ENGINE', 65);
+        }}, 1915);
+
+        fc.forEach(function(c,i){{
+            setTimeout(function(){{
+                c.style.transition='opacity 800ms var(--reveal), transform 800ms var(--reveal)';
+                c.style.opacity='1'; c.style.transform='scale(1)';
+                setTimeout(function(){{ c.classList.add('lit'); }}, 500);
+            }}, 2553+(i*BEAT));
+        }});
+
+        setTimeout(function(){{ bpT=Array.from(fc); startBP(); }}, 2553+(6*BEAT)+300);
+        setTimeout(function(){{ physics(Array.from(fc), 4); }}, 2553+(8*BEAT));
+        setTimeout(function(){{
+            ac.style.boxShadow='0 1rem 5rem rgba(45,212,191,0.1)';
+            ac.style.borderColor='rgba(45,212,191,0.2)';
+        }}, 2553+(7*BEAT));
+    }}, 22340);
+
+    /* ── SCENE 4: DREAM STATES (31.915s) ── */
+    setTimeout(function(){{
+        stopBP(); crossfade('scene4');
+        grid.style.opacity='0.4';
+
+        /* Vig A */
+        var vA=document.getElementById('vA');
+        vA.style.opacity='1';
+        animN(document.getElementById('cE'), 30, 2200, '');
+        var cc=document.querySelectorAll('.cal-cell');
+        cc.forEach(function(c,i){{
+            setTimeout(function(){{
+                c.style.transition='opacity 150ms var(--snap), transform 150ms var(--snap)';
+                c.style.opacity='1'; c.style.transform='scale(1)'; c.classList.add('filled');
+            }}, 300+(i*45));
+        }});
+        setTimeout(function(){{ lux(document.getElementById('vTA'), 0, 1000); }}, 2200);
+
+        /* Vig B (3191ms) */
+        setTimeout(function(){{
+            vA.style.opacity='0';
+            var vB=document.getElementById('vB');
+            vB.style.opacity='1';
+            var pf=document.getElementById('pF');
+            pf.style.transition='opacity 800ms var(--reveal), transform 800ms var(--reveal)';
+            pf.style.opacity='1'; pf.style.transform='scale(1)';
+            setTimeout(function(){{
+                var ey=document.getElementById('vBE');
+                ey.style.transition='opacity 600ms var(--reveal)'; ey.style.opacity='1';
+            }}, BEAT);
+            setTimeout(function(){{ lux(document.getElementById('vBH'), 0, 1000); }}, BEAT*2);
+        }}, 3191);
+
+        /* Vig C (6383ms) */
+        setTimeout(function(){{
+            document.getElementById('vB').style.opacity='0';
+            var vC=document.getElementById('vC');
+            vC.style.opacity='1';
+            var pe=document.getElementById('pE');
+            pe.style.transition='opacity 500ms var(--reveal)'; pe.style.opacity='1';
+            animN(pe, 100, 2000, '%');
+            var pt=document.getElementById('pT');
+            pt.style.transition='opacity 500ms ease'; pt.style.opacity='1';
+            setTimeout(function(){{
+                document.getElementById('pFl').style.transition='width 1800ms var(--snap)';
+                document.getElementById('pFl').style.width='100%';
+            }}, BEAT);
+            setTimeout(function(){{ lux(document.getElementById('vTC'), 0, 1000); }}, BEAT*3);
+        }}, 6383);
+    }}, 31915);
+
+    /* ── SCENE 5: CTA (41.489s) ── */
+    setTimeout(function(){{
+        stopBP(); mTI=0.4; crossfade('scene5');
+        grid.style.opacity='0.5';
+
+        lux(document.getElementById('cL'), BEAT, 1200);
+
+        setTimeout(function(){{
+            var e=document.getElementById('cE5');
+            e.style.transition='opacity 600ms var(--reveal)'; e.style.opacity='1';
+        }}, BEAT+200);
+
+        lux(document.getElementById('cB'), 1915, 1200);
+        lux(document.getElementById('cH'), 2200, 1000);
+
+        setTimeout(function(){{
+            var s=document.getElementById('cS');
+            s.style.transition='opacity 800ms var(--lux)'; s.style.opacity='1';
+        }}, 2500);
+
+        setTimeout(function(){{
+            document.getElementById('cP').style.animation='ctaBounce 800ms var(--snap) forwards';
+        }}, 2553);
+
+        setTimeout(function(){{
+            var p=document.getElementById('cP');
+            p.style.animation='ctaBounce 800ms var(--snap) forwards, radiateGlow 1.8s ease forwards';
+        }}, 3191);
+
+        setTimeout(function(){{
+            var u=document.getElementById('cU');
+            u.style.transition='opacity 1000ms var(--lux)'; u.style.opacity='1';
+        }}, 3830);
+    }}, 41489);
+
+}})();
+</script>
+</body>
+</html>

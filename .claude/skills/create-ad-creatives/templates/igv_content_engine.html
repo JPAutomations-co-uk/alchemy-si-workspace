@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family={heading_font_encoded}:wght@400;600;700;800;900&family={body_font_encoded}:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   IG ENGINE — 47s Beat-Synced Ad Template
+   Beat grid: 94 BPM / 638ms per beat / 2553ms per bar
+   ═══════════════════════════════════════════════ */
+
+*, *::before, *::after {{ margin: 0; padding: 0; box-sizing: border-box; }}
+
+:root {{
+    --primary: {primary_color};
+    --secondary: {secondary_color};
+    --accent: {accent_color};
+    --text-light: {text_light};
+    --font-heading: '{heading_font}', 'Inter', system-ui, sans-serif;
+    --font-body: '{body_font}', 'Inter', system-ui, sans-serif;
+    --font-mono: 'GeistMono', 'SF Mono', 'Fira Code', monospace;
+
+    /* Beat grid */
+    --beat: 638ms;
+    --bar: 2553ms;
+
+    /* The Curve — magnetic snap */
+    --snap: cubic-bezier(0.2, 0.0, 0, 1.0);
+    --snap-duration: 500ms;
+
+    /* Brand teal */
+    --teal: #2DD4BF;
+    --teal-dim: rgba(45, 212, 191, 0.15);
+    --teal-glow: rgba(45, 212, 191, 0.4);
+
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 20px;
+}}
+
+html, body {{
+    width: {width}px;
+    height: {height}px;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #000;
+    color: #fff;
+    font-family: var(--font-body);
+}}
+
+/* ── CANVAS GRADIENT MESH (background) ── */
+canvas#mesh {{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+}}
+
+/* ── SCENE CONTAINERS ── */
+.scene {{
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 60px;
+}}
+.scene.active {{
+    opacity: 1;
+    pointer-events: auto;
+}}
+
+/* ── TRANSITIONS ── */
+.fade-in {{
+    animation: fadeIn 600ms var(--snap) forwards;
+}}
+.fade-out {{
+    animation: fadeOut 400ms ease forwards;
+}}
+
+@keyframes fadeIn {{
+    from {{ opacity: 0; }}
+    to {{ opacity: 1; }}
+}}
+@keyframes fadeOut {{
+    from {{ opacity: 1; }}
+    to {{ opacity: 0; }}
+}}
+
+/* ── SCALE-IN POP ── */
+@keyframes scaleInPop {{
+    from {{ opacity: 0; transform: scale(0.92); }}
+    to {{ opacity: 1; transform: scale(1); }}
+}}
+
+/* ── MAGNETIC SNAP (translate + scale) ── */
+@keyframes snapIn {{
+    from {{ opacity: 0; transform: scale(0.92) translateY(30px); }}
+    to {{ opacity: 1; transform: scale(1) translateY(0); }}
+}}
+
+/* ── BEAT PULSE ── */
+@keyframes beatPulse {{
+    0% {{ transform: scale(1); }}
+    30% {{ transform: scale(1.02); }}
+    100% {{ transform: scale(1); }}
+}}
+
+/* ── DRIFT (slow float for intro) ── */
+@keyframes driftSlow {{
+    0%, 100% {{ transform: translate(0, 0) rotate(0deg); }}
+    25% {{ transform: translate(15px, -20px) rotate(2deg); }}
+    50% {{ transform: translate(-10px, 15px) rotate(-1deg); }}
+    75% {{ transform: translate(20px, 10px) rotate(1.5deg); }}
+}}
+
+/* ── SCATTER (icons fly outward) ── */
+@keyframes scatterOut {{
+    to {{ opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0.5) rotate(var(--sr)); }}
+}}
+
+/* ── GLOW PULSE ── */
+@keyframes glowPulse {{
+    0%, 100% {{ box-shadow: 0 0 0 0 var(--teal-glow); }}
+    50% {{ box-shadow: 0 0 40px 10px var(--teal-glow); }}
+}}
+
+/* ── CTA MICRO-INTERACTION ── */
+@keyframes ctaBounce {{
+    0% {{ opacity: 0; transform: scale(0.92); }}
+    60% {{ opacity: 1; transform: scale(0.98); }}
+    80% {{ transform: scale(1.03); }}
+    100% {{ transform: scale(1); }}
+}}
+
+/* ── CTA GLOW RADIATE ── */
+@keyframes radiateGlow {{
+    from {{ box-shadow: 0 0 0 0 var(--teal-glow); }}
+    to {{ box-shadow: 0 0 80px 40px rgba(45, 212, 191, 0); }}
+}}
+
+/* ── TYPEWRITER CURSOR ── */
+@keyframes cursorBlink {{
+    0%, 100% {{ opacity: 1; }}
+    50% {{ opacity: 0; }}
+}}
+
+/* ── SVG LINE DRAW ── */
+@keyframes drawLine {{
+    from {{ stroke-dashoffset: 1000; }}
+    to {{ stroke-dashoffset: 0; }}
+}}
+
+/* ── PROGRESS BAR ── */
+@keyframes fillBar {{
+    from {{ width: 0%; }}
+    to {{ width: 100%; }}
+}}
+
+/* ═══════════════════════════════════════════════
+   SCENE 1: "THE STRUGGLE" — Icons + chaos
+   ═══════════════════════════════════════════════ */
+
+#scene1 .icon {{
+    position: absolute;
+    font-size: 48px;
+    opacity: 0;
+    will-change: transform;
+}}
+
+#scene1 .struggle-text {{
+    font-family: var(--font-heading);
+    font-weight: 300;
+    font-size: 42px;
+    line-height: 1.3;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    max-width: 700px;
+    opacity: 0;
+}}
+
+/* ═══════════════════════════════════════════════
+   SCENE 2: "THE SNAP" — Order from chaos
+   ═══════════════════════════════════════════════ */
+
+#scene2 .grid-container {{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 700px;
+}}
+
+#scene2 .grid-cell {{
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: scale(0.92);
+}}
+
+#scene2 .grid-cell .cell-icon {{
+    font-size: 36px;
+}}
+
+#scene2 .grid-cell .cell-label {{
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.05em;
+}}
+
+#scene2 .snap-text {{
+    margin-top: 48px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.15;
+    text-align: center;
+    color: #fff;
+}}
+
+#scene2 .snap-text .word {{
+    display: inline-block;
+    opacity: 0;
+    transform: scale(0.92);
+    margin: 0 6px;
+}}
+
+/* ═══════════════════════════════════════════════
+   SCENE 3: "THE ENGINE" — Product reveal
+   ═══════════════════════════════════════════════ */
+
+#scene3 .engine-container {{
+    position: relative;
+    width: 100%;
+    max-width: 780px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}}
+
+#scene3 .app-card {{
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 28px;
+    padding: 40px 32px 32px;
+    width: 100%;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.92);
+}}
+
+#scene3 .app-title {{
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+}}
+
+#scene3 .app-title .cursor {{
+    display: inline-block;
+    width: 2px;
+    height: 32px;
+    background: var(--teal);
+    margin-left: 4px;
+    vertical-align: middle;
+    animation: cursorBlink 750ms step-end infinite;
+}}
+
+#scene3 .app-subtitle {{
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.04em;
+}}
+
+#scene3 .feature-grid {{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+}}
+
+#scene3 .feature-card {{
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: scale(0.92);
+    transition: transform 200ms var(--snap);
+}}
+
+#scene3 .feature-card .f-icon {{
+    font-size: 22px;
+    color: var(--teal);
+    flex-shrink: 0;
+    width: 36px;
+    text-align: center;
+}}
+
+#scene3 .feature-card .f-name {{
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 15px;
+    color: #fff;
+}}
+
+/* ═══════════════════════════════════════════════
+   SCENE 4: "DREAM STATES" — Vignettes
+   ═══════════════════════════════════════════════ */
+
+#scene4 {{
+    padding: 60px;
+}}
+
+.vignette {{
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 60px;
+    opacity: 0;
+}}
+
+/* Vignette A: Counter + Calendar */
+.vig-a .counter {{
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 140px;
+    color: var(--teal);
+    line-height: 1;
+    margin-bottom: 16px;
+}}
+
+.vig-a .calendar-grid {{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    width: 360px;
+    margin-bottom: 32px;
+}}
+
+.vig-a .cal-cell {{
+    width: 100%;
+    aspect-ratio: 1;
+    background: rgba(45, 212, 191, 0.08);
+    border: 1px solid rgba(45, 212, 191, 0.15);
+    border-radius: 6px;
+    opacity: 0;
+    transform: scale(0.8);
+}}
+
+.vig-a .cal-cell.filled {{
+    background: rgba(45, 212, 191, 0.25);
+    border-color: rgba(45, 212, 191, 0.4);
+}}
+
+.vig-text {{
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 32px;
+    text-align: center;
+    color: #fff;
+    max-width: 600px;
+    line-height: 1.3;
+    opacity: 0;
+}}
+
+/* Vignette B: Phone mockup */
+.vig-b .phone-frame {{
+    width: 260px;
+    height: 520px;
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 32px;
+    opacity: 0;
+    transform: scale(0.92);
+}}
+
+.vig-b .phone-screen {{
+    position: absolute;
+    inset: 8px;
+    border-radius: 32px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--teal), rgba(45, 212, 191, 0.3), #000);
+    background-size: 300% 300%;
+    animation: phoneGradient 3s ease infinite;
+}}
+
+@keyframes phoneGradient {{
+    0% {{ background-position: 0% 0%; }}
+    50% {{ background-position: 100% 100%; }}
+    100% {{ background-position: 0% 0%; }}
+}}
+
+.vig-b .phone-screen::after {{
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-left: 28px solid rgba(255, 255, 255, 0.8);
+    border-top: 18px solid transparent;
+    border-bottom: 18px solid transparent;
+}}
+
+.vig-b .quality-badge {{
+    position: absolute;
+    bottom: 60px;
+    right: -10px;
+    background: var(--teal);
+    color: #000;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: scale(0.8);
+}}
+
+/* Vignette C: Progress */
+.vig-c .morph-icon {{
+    font-size: 80px;
+    margin-bottom: 24px;
+    opacity: 0;
+}}
+
+.vig-c .progress-track {{
+    width: 400px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 32px;
+    opacity: 0;
+}}
+
+.vig-c .progress-fill {{
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), rgba(45, 212, 191, 0.6));
+    border-radius: 4px;
+    width: 0%;
+}}
+
+/* ═══════════════════════════════════════════════
+   SCENE 5: CTA
+   ═══════════════════════════════════════════════ */
+
+#scene5 {{
+    gap: 20px;
+}}
+
+#scene5 .logo-container {{
+    opacity: 0;
+    transform: scale(0.92);
+    margin-bottom: 8px;
+}}
+
+#scene5 .logo-container img {{
+    height: 60px;
+    width: auto;
+    object-fit: contain;
+}}
+
+#scene5 .cta-brand {{
+    font-family: var(--font-mono);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 0.08em;
+    opacity: 0;
+    transform: scale(0.92);
+}}
+
+#scene5 .cta-headline {{
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 52px;
+    color: #fff;
+    opacity: 0;
+    transform: scale(0.92);
+}}
+
+#scene5 .cta-pill {{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 44px;
+    background: var(--teal);
+    color: #000;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    opacity: 0;
+    transform: scale(0.92);
+}}
+
+#scene5 .cta-url {{
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.04em;
+    opacity: 0;
+}}
+
+/* ── Utility: screen shake ── */
+@keyframes shake {{
+    0%, 100% {{ transform: translate(0, 0); }}
+    20% {{ transform: translate(-4px, 2px); }}
+    40% {{ transform: translate(3px, -3px); }}
+    60% {{ transform: translate(-2px, 4px); }}
+    80% {{ transform: translate(4px, -2px); }}
+}}
+
+.shaking {{
+    animation: shake 300ms ease;
+}}
+
+</style>
+</head>
+<body>
+
+<!-- Gradient mesh background -->
+<canvas id="mesh" width="{width}" height="{height}"></canvas>
+
+<!-- ═══ SCENE 1: THE STRUGGLE ═══ -->
+<div id="scene1" class="scene">
+    <div class="icon" id="ico-camera" style="top:30%;left:20%">📷</div>
+    <div class="icon" id="ico-clock" style="top:25%;left:70%">⏰</div>
+    <div class="icon" id="ico-calendar" style="top:55%;left:15%">📅</div>
+    <div class="icon" id="ico-pen" style="top:60%;left:75%">✏️</div>
+    <div class="icon" id="ico-phone" style="top:45%;left:45%">📱</div>
+    <div class="icon" id="ico-chart" style="top:35%;left:55%">📊</div>
+    <div class="icon" id="ico-hashtag" style="top:70%;left:40%">️#️⃣</div>
+    <div class="icon" id="ico-fire" style="top:20%;left:40%">🔥</div>
+    <div class="struggle-text" id="struggle-text">Creating content shouldn't feel like this.</div>
+</div>
+
+<!-- ═══ SCENE 2: THE SNAP ═══ -->
+<div id="scene2" class="scene">
+    <div class="grid-container" id="snap-grid">
+        <div class="grid-cell"><span class="cell-icon">📷</span><span class="cell-label">Photos</span></div>
+        <div class="grid-cell"><span class="cell-icon">🎬</span><span class="cell-label">Reels</span></div>
+        <div class="grid-cell"><span class="cell-icon">📊</span><span class="cell-label">Analytics</span></div>
+        <div class="grid-cell"><span class="cell-icon">📅</span><span class="cell-label">Schedule</span></div>
+        <div class="grid-cell"><span class="cell-icon">✏️</span><span class="cell-label">Captions</span></div>
+        <div class="grid-cell"><span class="cell-icon">#️⃣</span><span class="cell-label">Hashtags</span></div>
+    </div>
+    <div class="snap-text" id="snap-text">
+        <span class="word">What</span>
+        <span class="word">if</span>
+        <span class="word">it</span>
+        <span class="word">created</span>
+        <span class="word">itself?</span>
+    </div>
+</div>
+
+<!-- ═══ SCENE 3: THE ENGINE ═══ -->
+<div id="scene3" class="scene">
+    <div class="engine-container">
+        <div class="app-card" id="app-card">
+            <div class="app-title" id="app-title-text">
+                <span id="typewriter-target"></span><span class="cursor" id="type-cursor"></span>
+            </div>
+            <div class="app-subtitle">by JPAutomations</div>
+        </div>
+        <div class="feature-grid" id="feature-grid">
+            <div class="feature-card"><span class="f-icon">▶</span><span class="f-name">AI Reels</span></div>
+            <div class="feature-card"><span class="f-icon">⊞</span><span class="f-name">Carousels</span></div>
+            <div class="feature-card"><span class="f-icon">◻</span><span class="f-name">Images</span></div>
+            <div class="feature-card"><span class="f-icon">✎</span><span class="f-name">Captions</span></div>
+            <div class="feature-card"><span class="f-icon">◈</span><span class="f-name">Content Plans</span></div>
+            <div class="feature-card"><span class="f-icon">◎</span><span class="f-name">Ad Creatives</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SCENE 4: DREAM STATES ═══ -->
+<div id="scene4" class="scene">
+    <!-- Vignette A: Counter + Calendar -->
+    <div class="vignette vig-a" id="vig-a">
+        <div class="counter" id="counter-el">0</div>
+        <div class="calendar-grid" id="cal-grid"></div>
+        <div class="vig-text" id="vig-text-a">A month of content. Minutes to make.</div>
+    </div>
+
+    <!-- Vignette B: Phone mockup -->
+    <div class="vignette vig-b" id="vig-b">
+        <div class="phone-frame" id="phone-frame">
+            <div class="phone-screen"></div>
+            <div class="quality-badge" id="quality-badge">AI-Generated</div>
+        </div>
+        <div class="vig-text" id="vig-text-b">Every reel. Every carousel. On brand.</div>
+    </div>
+
+    <!-- Vignette C: Progress -->
+    <div class="vignette vig-c" id="vig-c">
+        <div class="morph-icon" id="morph-icon">⏳</div>
+        <div class="progress-track" id="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="vig-text" id="vig-text-c">You describe it. We generate it.</div>
+    </div>
+</div>
+
+<!-- ═══ SCENE 5: CTA ═══ -->
+<div id="scene5" class="scene">
+    <div class="logo-container" id="cta-logo">{logo_html}</div>
+    <div class="cta-brand" id="cta-brand">IG ENGINE</div>
+    <div class="cta-headline" id="cta-headline">Start generating.</div>
+    <div class="cta-pill" id="cta-pill">{cta}</div>
+    <div class="cta-url" id="cta-url">jpautomations.co.uk</div>
+</div>
+
+<script>
+(function() {{
+    /* ═══════════════════════════════════════════════
+       CONSTANTS — Beat grid at 94 BPM
+       ═══════════════════════════════════════════════ */
+    var BEAT = 638;   // ms per beat
+    var BAR = 2553;   // ms per bar (4 beats)
+    var W = {width};
+    var H = {height};
+
+    /* ═══════════════════════════════════════════════
+       GRADIENT MESH — Canvas background
+       ═══════════════════════════════════════════════ */
+    var canvas = document.getElementById('mesh');
+    var ctx = canvas.getContext('2d');
+    var meshPhase = 0;
+    var meshIntensity = 0;    // 0 = dark, 1 = full teal
+    var meshWarmth = 0;       // 0 = normal, 1 = stress tint
+    var meshTargetIntensity = 0;
+    var meshTargetWarmth = 0;
+
+    function drawMesh(t) {{
+        meshPhase = t * 0.0004;
+        // Lerp intensity
+        meshIntensity += (meshTargetIntensity - meshIntensity) * 0.03;
+        meshWarmth += (meshTargetWarmth - meshWarmth) * 0.03;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // Base radial: teal center glow
+        var cx = W * 0.5 + Math.sin(meshPhase) * W * 0.1;
+        var cy = H * 0.4 + Math.cos(meshPhase * 0.7) * H * 0.08;
+        var r = Math.max(W, H) * 0.7;
+
+        var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        var tealAlpha = 0.06 + meshIntensity * 0.25;
+        var warmAlpha = meshWarmth * 0.12;
+
+        grad.addColorStop(0, 'rgba(45,212,191,' + tealAlpha + ')');
+        grad.addColorStop(0.3, 'rgba(20,100,90,' + (tealAlpha * 0.5) + ')');
+        if (warmAlpha > 0.01) {{
+            grad.addColorStop(0.5, 'rgba(200,80,50,' + warmAlpha + ')');
+        }}
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Secondary orb — drifts
+        var cx2 = W * 0.7 + Math.cos(meshPhase * 1.3) * W * 0.15;
+        var cy2 = H * 0.65 + Math.sin(meshPhase * 0.9) * H * 0.1;
+        var grad2 = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, r * 0.5);
+        grad2.addColorStop(0, 'rgba(45,212,191,' + (tealAlpha * 0.4) + ')');
+        grad2.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad2;
+        ctx.fillRect(0, 0, W, H);
+
+        requestAnimationFrame(drawMesh);
+    }}
+    requestAnimationFrame(drawMesh);
+
+    /* ═══════════════════════════════════════════════
+       BEAT PULSE SYSTEM
+       ═══════════════════════════════════════════════ */
+    var beatPulseTargets = [];
+    var beatPulseActive = false;
+    var beatPulseInterval = null;
+
+    function startBeatPulse() {{
+        if (beatPulseActive) return;
+        beatPulseActive = true;
+        beatPulseInterval = setInterval(function() {{
+            beatPulseTargets.forEach(function(el) {{
+                el.style.transition = 'transform 200ms var(--snap)';
+                el.style.transform = 'scale(1.02)';
+                setTimeout(function() {{
+                    el.style.transform = 'scale(1)';
+                }}, 200);
+            }});
+        }}, BEAT);
+    }}
+
+    function stopBeatPulse() {{
+        beatPulseActive = false;
+        if (beatPulseInterval) clearInterval(beatPulseInterval);
+        beatPulseTargets = [];
+    }}
+
+    /* ═══════════════════════════════════════════════
+       SCENE MANAGER
+       ═══════════════════════════════════════════════ */
+    function showScene(id) {{
+        document.querySelectorAll('.scene').forEach(function(s) {{
+            s.classList.remove('active');
+        }});
+        var el = document.getElementById(id);
+        if (el) el.classList.add('active');
+    }}
+
+    function animateElement(el, delay, animation, duration) {{
+        setTimeout(function() {{
+            el.style.animation = animation + ' ' + (duration || 500) + 'ms var(--snap) forwards';
+        }}, delay);
+    }}
+
+    function snapElement(el, delay) {{
+        setTimeout(function() {{
+            el.style.transition = 'opacity 500ms var(--snap), transform 500ms var(--snap)';
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1)';
+        }}, delay);
+    }}
+
+    /* ═══════════════════════════════════════════════
+       TYPEWRITER
+       ═══════════════════════════════════════════════ */
+    function typewrite(targetEl, text, speed, callback) {{
+        var i = 0;
+        var interval = setInterval(function() {{
+            if (i < text.length) {{
+                targetEl.textContent += text[i];
+                i++;
+            }} else {{
+                clearInterval(interval);
+                if (callback) callback();
+            }}
+        }}, speed);
+    }}
+
+    /* ═══════════════════════════════════════════════
+       COUNTER ANIMATION
+       ═══════════════════════════════════════════════ */
+    function animateCounter(el, target, duration) {{
+        var start = performance.now();
+        function step(now) {{
+            var elapsed = now - start;
+            var t = Math.min(elapsed / duration, 1);
+            var eased = 1 - Math.pow(1 - t, 3); // easeOut cubic
+            el.textContent = Math.round(eased * target);
+            if (t < 1) requestAnimationFrame(step);
+        }}
+        requestAnimationFrame(step);
+    }}
+
+    /* ═══════════════════════════════════════════════
+       PHYSICS REACTION
+       ═══════════════════════════════════════════════ */
+    function physicsReact(cards, outwardPx) {{
+        cards.forEach(function(card, i) {{
+            var angle = (i / cards.length) * Math.PI * 2;
+            var dx = Math.cos(angle) * outwardPx;
+            var dy = Math.sin(angle) * outwardPx;
+            card.style.transition = 'transform 300ms var(--snap)';
+            card.style.transform = 'scale(1) translate(' + dx + 'px,' + dy + 'px)';
+            setTimeout(function() {{
+                card.style.transform = 'scale(1) translate(0,0)';
+            }}, 300);
+        }});
+    }}
+
+    /* ═══════════════════════════════════════════════
+       BUILD CALENDAR GRID
+       ═══════════════════════════════════════════════ */
+    var calGrid = document.getElementById('cal-grid');
+    for (var ci = 0; ci < 28; ci++) {{
+        var cell = document.createElement('div');
+        cell.className = 'cal-cell';
+        calGrid.appendChild(cell);
+    }}
+
+    /* ═══════════════════════════════════════════════
+       SCENE ORCHESTRATION — beat-mapped
+       All times in ms from 0
+       ═══════════════════════════════════════════════ */
+
+    // ── SCENE 1: THE STRUGGLE (0–17.234s) ──
+    showScene('scene1');
+
+    var icons = document.querySelectorAll('#scene1 .icon');
+    var struggleText = document.getElementById('struggle-text');
+
+    // 0s: Gradient mesh begins fading in (handled by meshTargetIntensity)
+    setTimeout(function() {{
+        meshTargetIntensity = 0.3;
+    }}, 0);
+
+    // 2.553s (Bar 2): Icons start drifting in one by one
+    icons.forEach(function(ico, i) {{
+        var delay = 2553 + (i * 400);
+        setTimeout(function() {{
+            ico.style.opacity = '1';
+            ico.style.transition = 'opacity 1200ms ease';
+            ico.style.animation = 'driftSlow ' + (4 + i * 0.5) + 's ease-in-out infinite';
+        }}, delay);
+    }});
+
+    // 7.66s (Bar 4): Struggle text fades in with scale-in
+    setTimeout(function() {{
+        struggleText.style.animation = 'scaleInPop 900ms var(--snap) forwards';
+    }}, 7660);
+
+    // 10.213s (Bar 5): More intensity, speed up drift
+    setTimeout(function() {{
+        meshTargetIntensity = 0.4;
+        icons.forEach(function(ico) {{
+            ico.style.animationDuration = '2s';
+        }});
+    }}, 10213);
+
+    // 12.766s (Bar 6): Stress warmth
+    setTimeout(function() {{
+        meshTargetWarmth = 0.8;
+    }}, 12766);
+
+    // 14.681s (Bar 6, Beat 4): Scatter + shake
+    setTimeout(function() {{
+        var scatterDirs = [
+            [-300, -400, -30], [300, -350, 25], [-250, 400, -20],
+            [350, 300, 30], [0, -500, 15], [-400, 0, -25],
+            [200, 450, 20], [0, 500, -15]
+        ];
+        icons.forEach(function(ico, i) {{
+            var d = scatterDirs[i % scatterDirs.length];
+            ico.style.setProperty('--sx', d[0] + 'px');
+            ico.style.setProperty('--sy', d[1] + 'px');
+            ico.style.setProperty('--sr', d[2] + 'deg');
+            ico.style.animation = 'scatterOut 600ms ease forwards';
+        }});
+        document.getElementById('scene1').classList.add('shaking');
+    }}, 14681);
+
+    // 15.957s (Bar 7): Freeze — everything dims
+    setTimeout(function() {{
+        struggleText.style.transition = 'opacity 400ms ease';
+        struggleText.style.opacity = '0';
+        meshTargetWarmth = 0;
+        meshTargetIntensity = 0.1;
+    }}, 15957);
+
+    // ── SCENE 2: THE SNAP (17.234s) — BEAT DROP ──
+    setTimeout(function() {{
+        showScene('scene2');
+        meshTargetIntensity = 1.0;  // Full teal flood
+        meshTargetWarmth = 0;
+
+        var cells = document.querySelectorAll('#scene2 .grid-cell');
+
+        // THE SNAP: Grid cells appear with magnetic snap (staggered per beat)
+        cells.forEach(function(cell, i) {{
+            snapElement(cell, i * 120);  // rapid stagger within the bar
+        }});
+
+        // 19.787s (Bar 9, Beat 1): Snap text — word by word on beats
+        var words = document.querySelectorAll('#scene2 .snap-text .word');
+        words.forEach(function(word, i) {{
+            setTimeout(function() {{
+                word.style.transition = 'opacity 400ms var(--snap), transform 400ms var(--snap)';
+                word.style.opacity = '1';
+                word.style.transform = 'scale(1)';
+            }}, 2553 + (i * BEAT)); // 2553ms after scene start = Bar 9
+        }});
+
+        // Glow pulse on grid cells
+        setTimeout(function() {{
+            cells.forEach(function(cell) {{
+                cell.style.animation = 'glowPulse 1.2s ease infinite';
+            }});
+        }}, 1915); // ~Bar 8 Beat 4
+
+        // Start beat pulse
+        beatPulseTargets = Array.from(cells);
+        startBeatPulse();
+
+    }}, 17234);
+
+    // ── SCENE 3: THE ENGINE (22.340s) ──
+    setTimeout(function() {{
+        stopBeatPulse();
+        showScene('scene3');
+
+        var appCard = document.getElementById('app-card');
+        var featureCards = document.querySelectorAll('#scene3 .feature-card');
+
+        // App card scales in (Bar 10, Beat 3 — 1277ms after scene)
+        setTimeout(function() {{
+            snapElement(appCard, 0);
+        }}, 1277);
+
+        // Typewriter "IG ENGINE" (Bar 10, Beat 4 — 1915ms)
+        setTimeout(function() {{
+            typewrite(document.getElementById('typewriter-target'), 'IG ENGINE', 60);
+        }}, 1915);
+
+        // Feature cards — one per beat starting Bar 11
+        featureCards.forEach(function(card, i) {{
+            snapElement(card, 2553 + (i * BEAT)); // Bar 11 + i beats
+        }});
+
+        // Beat pulse on feature cards (after they're all in)
+        setTimeout(function() {{
+            beatPulseTargets = Array.from(featureCards);
+            startBeatPulse();
+        }}, 2553 + (6 * BEAT));
+
+        // Physics reaction (Bar 12, Beat 4)
+        setTimeout(function() {{
+            physicsReact(Array.from(featureCards), 4);
+        }}, 2553 + (8 * BEAT)); // ~7 bars after scene start
+
+    }}, 22340);
+
+    // ── SCENE 4: DREAM STATES (31.915s) ──
+    setTimeout(function() {{
+        stopBeatPulse();
+        showScene('scene4');
+
+        // === Vignette A: Counter (0ms offset) ===
+        var vigA = document.getElementById('vig-a');
+        vigA.style.transition = 'opacity 400ms var(--snap)';
+        vigA.style.opacity = '1';
+
+        // Counter 0→30
+        animateCounter(document.getElementById('counter-el'), 30, 2000);
+
+        // Calendar cells fill in
+        var calCells = document.querySelectorAll('.cal-cell');
+        calCells.forEach(function(cell, i) {{
+            setTimeout(function() {{
+                cell.style.transition = 'opacity 150ms var(--snap), transform 150ms var(--snap), background 150ms ease';
+                cell.style.opacity = '1';
+                cell.style.transform = 'scale(1)';
+                cell.classList.add('filled');
+            }}, 200 + (i * 50));
+        }});
+
+        // Text
+        setTimeout(function() {{
+            var txt = document.getElementById('vig-text-a');
+            txt.style.animation = 'scaleInPop 500ms var(--snap) forwards';
+        }}, 2200);
+
+        // === Vignette B: Phone (3.191s offset = ~5 beats) ===
+        setTimeout(function() {{
+            vigA.style.opacity = '0';
+            var vigB = document.getElementById('vig-b');
+            vigB.style.transition = 'opacity 400ms var(--snap)';
+            vigB.style.opacity = '1';
+
+            var phone = document.getElementById('phone-frame');
+            phone.style.transition = 'opacity 500ms var(--snap), transform 500ms var(--snap)';
+            phone.style.opacity = '1';
+            phone.style.transform = 'scale(1)';
+
+            setTimeout(function() {{
+                var badge = document.getElementById('quality-badge');
+                badge.style.transition = 'opacity 300ms var(--snap), transform 300ms var(--snap)';
+                badge.style.opacity = '1';
+                badge.style.transform = 'scale(1)';
+            }}, BEAT * 2);
+
+            setTimeout(function() {{
+                var txt = document.getElementById('vig-text-b');
+                txt.style.animation = 'scaleInPop 500ms var(--snap) forwards';
+            }}, BEAT * 3);
+
+        }}, 3191);
+
+        // === Vignette C: Progress (6.383s offset = ~10 beats) ===
+        setTimeout(function() {{
+            document.getElementById('vig-b').style.opacity = '0';
+            var vigC = document.getElementById('vig-c');
+            vigC.style.transition = 'opacity 400ms var(--snap)';
+            vigC.style.opacity = '1';
+
+            var icon = document.getElementById('morph-icon');
+            icon.style.transition = 'opacity 500ms var(--snap)';
+            icon.style.opacity = '1';
+
+            // Morph hourglass to checkmark
+            setTimeout(function() {{
+                icon.style.transition = 'transform 300ms var(--snap), opacity 200ms ease';
+                icon.style.transform = 'rotate(180deg) scale(0.8)';
+                icon.style.opacity = '0';
+                setTimeout(function() {{
+                    icon.textContent = '✅';
+                    icon.style.transform = 'rotate(0deg) scale(1)';
+                    icon.style.opacity = '1';
+                }}, 300);
+            }}, BEAT);
+
+            // Progress bar
+            var track = document.getElementById('progress-track');
+            track.style.transition = 'opacity 300ms ease';
+            track.style.opacity = '1';
+            setTimeout(function() {{
+                var fill = document.getElementById('progress-fill');
+                fill.style.transition = 'width 1500ms var(--snap)';
+                fill.style.width = '100%';
+            }}, BEAT);
+
+            // Text
+            setTimeout(function() {{
+                var txt = document.getElementById('vig-text-c');
+                txt.style.animation = 'scaleInPop 500ms var(--snap) forwards';
+            }}, BEAT * 3);
+
+        }}, 6383);
+
+    }}, 31915);
+
+    // ── SCENE 5: CTA (41.489s) ──
+    setTimeout(function() {{
+        stopBeatPulse();
+        meshTargetIntensity = 0.6;
+        showScene('scene5');
+
+        // Logo (Bar 18, Beat 2 — 639ms after scene)
+        setTimeout(function() {{
+            snapElement(document.getElementById('cta-logo'), 0);
+        }}, 639);
+
+        // Brand text (Bar 19, Beat 1 — 1915ms)
+        setTimeout(function() {{
+            snapElement(document.getElementById('cta-brand'), 0);
+        }}, 1915);
+
+        // Headline
+        setTimeout(function() {{
+            snapElement(document.getElementById('cta-headline'), 0);
+        }}, 2200);
+
+        // CTA pill with overshoot
+        setTimeout(function() {{
+            var pill = document.getElementById('cta-pill');
+            pill.style.animation = 'ctaBounce 600ms var(--snap) forwards';
+        }}, 2553);
+
+        // Glow radiate
+        setTimeout(function() {{
+            var pill = document.getElementById('cta-pill');
+            pill.style.animation = 'ctaBounce 600ms var(--snap) forwards, radiateGlow 1.5s ease forwards';
+        }}, 3191);
+
+        // URL
+        setTimeout(function() {{
+            var url = document.getElementById('cta-url');
+            url.style.transition = 'opacity 800ms ease';
+            url.style.opacity = '1';
+        }}, 3830);
+
+    }}, 41489);
+
+}})();
+</script>
+</body>
+</html>
